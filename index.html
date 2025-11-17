@@ -20,8 +20,8 @@
         :root { --primary: #ea4335; --secondary: #34a853; --accent: #fbbc05; --light: #f8f9fa; --dark: #202124; --gray: #5f6368; }
         body { background-color: #f5f7fa; color: var(--dark); line-height: 1.6; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-        .auth-container, .public-payment-container { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #c5372a 0%, #a02d22 100%); padding: 20px; }
-        .auth-card, .payment-card { background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; padding: 30px; }
+        .auth-container { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #c5372a 0%, #a02d22 100%); padding: 20px; }
+        .auth-card { background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; padding: 30px; }
         .logo { text-align: center; margin-bottom: 25px; }
         .logo h1 { color: var(--primary); font-size: 28px; margin-bottom: 5px; }
         .logo p { color: var(--gray); font-size: 14px; }
@@ -36,7 +36,7 @@
         @keyframes btn-loader { to { transform: rotate(1turn); } }
         .btn-secondary { background: var(--secondary); }
         .btn-secondary:hover { background: #2d9355; }
-        .home-container, .public-payment-container { display: none; }
+        .home-container { display: none; }
         .header { background: white; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; }
         .header-content { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; }
         .menu-toggle { font-size: 24px; color: var(--dark); cursor: pointer; }
@@ -100,53 +100,9 @@
         .modal-content { background: white; padding: 25px; border-radius: 12px; text-align: center; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-width: 90%; width: 400px; }
         .modal-close { position: absolute; top: 10px; right: 15px; font-size: 28px; color: var(--gray); cursor: pointer; font-weight: bold; }
         .confirmation-details .info-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; }
-        .payment-summary { list-style: none; text-align: left; margin: 20px 0; }
-        .payment-summary li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .payment-summary li span { color: var(--gray); }
     </style>
 </head>
 <body>
-    <!-- Public Payment Flow -->
-    <div class="public-payment-container" id="public-payment-page">
-        <div class="payment-card">
-            <div class="logo"><h1>WMT Payment</h1><p>to <strong id="payment-merchant-name">Merchant</strong></p></div>
-            <!-- Step 1: Amount -->
-            <div id="payment-step-1">
-                <h2>Enter Amount</h2>
-                <form id="payment-amount-form">
-                    <div class="form-group">
-                        <label for="payment-amount">Amount ($)</label>
-                        <input type="number" step="0.01" class="form-control" id="payment-amount" placeholder="0.00" required>
-                    </div>
-                    <button type="submit" class="btn">Next</button>
-                </form>
-            </div>
-            <!-- Step 2: Confirmation -->
-            <div id="payment-step-2" style="display: none;">
-                <h2>Payment Summary</h2>
-                <ul class="payment-summary">
-                    <li><span>Amount:</span><strong id="summary-amount"></strong></li>
-                    <li><span>Merchant ID (PWMT):</span><div style="display: flex; align-items: center; gap: 8px;"><strong id="summary-merchant-id"></strong> <i class="fas fa-copy copy-icon" id="summary-copy-btn"></i></div></li>
-                </ul>
-                <p style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">Please enter the Transaction ID from your WMT User App to confirm this payment.</p>
-                <form id="payment-confirm-form">
-                    <div class="form-group">
-                        <label for="payment-tx-id">Transaction ID</label>
-                        <input type="text" class="form-control" id="payment-tx-id" placeholder="Enter transaction ID to confirm" required>
-                    </div>
-                    <button type="submit" class="btn" id="confirm-payment-btn">Confirm Payment</button>
-                </form>
-            </div>
-             <!-- Step 3: Success -->
-            <div id="payment-step-3" style="display: none; text-align: center;">
-                 <i class="fas fa-check-circle" style="font-size: 60px; color: var(--secondary); margin-bottom: 20px;"></i>
-                 <h2>Payment Verified!</h2>
-                 <p>Your payment has been successfully received and verified.</p>
-                 <p style="margin-top: 15px;"><a href="/">Go back to home</a></p>
-            </div>
-        </div>
-    </div>
-
     <!-- Login Page -->
     <div class="auth-container" id="login-page">
         <div class="auth-card">
@@ -159,7 +115,7 @@
         </div>
     </div>
 
-    <!-- Merchant Home Page (HTML structure remains the same) -->
+    <!-- Merchant Home Page -->
     <div class="home-container" id="home-page">
         <header class="header">
             <div class="container">
@@ -176,7 +132,6 @@
             <ul class="sidebar-menu">
                 <li><a href="#home" class="sidebar-link active" data-page="home"><i class="fas fa-home"></i> Dashboard</a></li>
                 <li><a href="#transactions" class="sidebar-link" data-page="transactions"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
-                <li><a href="#url-payment" class="sidebar-link" data-page="url-payment"><i class="fas fa-link"></i> URL Payment</a></li>
                 <li><a href="#profile" class="sidebar-link" data-page="profile"><i class="fas fa-user"></i> My Profile</a></li>
                 <li><a href="#settings" class="sidebar-link" data-page="settings"><i class="fas fa-cog"></i> Settings</a></li>
                 <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -188,7 +143,6 @@
             <div class="container">
                 <div class="page active" id="home-content"><div class="balance-card"><h3>Available Balance</h3><div class="balance-amount">$<span id="home-balance">0.00</span></div></div><div class="services-grid"><div class="service-card add-money" data-service="add-money"><div class="service-icon"><i class="fas fa-plus"></i></div><h4>Add Money</h4></div><div class="service-card send-money" data-service="send-money"><div class="service-icon"><i class="fas fa-paper-plane"></i></div><h4>Send Money</h4></div><div class="service-card money-out" data-service="money-out"><div class="service-icon"><i class="fas fa-money-bill-wave"></i></div><h4>Money Out</h4></div></div><div class="transactions-section"><div class="section-header"><h3>Recent Transactions</h3><a href="#transactions" class="view-all" id="view-all-transactions">View All</a></div><ul class="transaction-list" id="recent-transactions"></ul></div></div>
                 <div class="page" id="transactions-content"><div class="form-page"><h2>All Transactions</h2><div class="transactions-section"><ul class="transaction-list" id="all-transactions"></ul></div></div></div>
-                <div class="page" id="url-payment-content"><div class="form-page"><h2>Public Payment URL</h2><p style="margin-bottom: 20px; color: var(--gray);">Share this URL with your customers to receive payments directly.</p><div class="form-group"><label>Your Unique Payment URL</label><div class="user-id-display"><input type="text" class="form-control" id="public-payment-url" readonly><button class="copy-btn" onclick="copyToClipboard(document.getElementById('public-payment-url').value, 'Payment URL')">Copy</button></div></div></div></div>
                 <div class="page" id="profile-content"><div class="form-page"><h2>My Profile</h2><div class="profile-upload"><img src="" alt="Profile" class="profile-image" id="profile-image-view"><input type="file" id="profile-image-upload" accept="image/*" style="display: none;"><button type="button" class="upload-btn" id="upload-image-btn">Change Profile Image</button></div><button class="btn btn-secondary" id="show-qr-btn" style="margin-bottom: 20px;"><i class="fas fa-qrcode"></i> Show My Payment QR Code</button><div class="form-group"><label>Business Name</label><div class="form-control" style="background: #f9f9f9;" id="profile-name"></div></div><div class="form-group"><label>Merchant ID (PWMT)</label><div class="user-id-display"><input type="text" class="form-control" id="profile-user-id" readonly><button class="copy-btn" onclick="copyToClipboard(document.getElementById('profile-user-id').value, 'Merchant ID')">Copy</button></div></div><div class="form-group"><label>Email</label><div class="form-control" style="background: #f9f9f9;" id="profile-email"></div></div></div></div>
                 <div class="page" id="settings-content"><div class="form-page"><h2>Settings</h2><h3>Change Password</h3><div class="form-group"><label for="current-password">Current Password</label><input type="password" class="form-control" id="current-password"></div><div class="form-group"><label for="new-password">New Password (min. 6 characters)</label><input type="password" class="form-control" id="new-password"></div><button class="btn" id="change-password-btn">Change Password</button></div></div>
                 <div class="page" id="add-money-content"><div class="form-page"><h2>Add Money</h2><div class="form-group"><label for="redeem-code">Redeem Code</label><input type="text" class="form-control" id="redeem-code" placeholder="Enter redeem code from admin"></div><div class="form-group"><label for="redeem-password">Code Password</label><input type="password" class="form-control" id="redeem-password" placeholder="Enter password for the code"></div><button class="btn" id="redeem-btn">Redeem Code</button></div></div>
@@ -198,7 +152,7 @@
         </main>
     </div>
 
-    <!-- Modals (HTML structure remains the same) -->
+    <!-- Modals -->
     <div class="modal-overlay" id="qr-modal"><div class="modal-content"><span class="modal-close" onclick="closeModal('qr-modal')">&times;</span><h3>Scan to Receive Payment</h3><div id="modal-qrcode-container"></div><p style="margin-top: 10px; color: var(--gray);">My Merchant ID: <strong id="modal-user-id"></strong></p></div></div>
     <div class="modal-overlay" id="qr-scanner-modal"><div class="modal-content"><span class="modal-close" onclick="closeModal('qr-scanner-modal')">&times;</span><h3>Scan QR Code</h3><div id="qr-reader" style="width: 100%;"></div></div></div>
     <div class="modal-overlay" id="confirmation-modal"><div class="modal-content" style="max-width: 450px; text-align: left;"><div style="text-align: center; color: var(--secondary); margin-bottom: 20px;"><i class="fas fa-check-circle" style="font-size: 60px;"></i><h3 style="margin-top: 15px; font-size: 22px;">Transaction Successful</h3></div><div class="confirmation-details"><div class="info-row"><span>Amount:</span><strong id="confirm-amount"></strong></div><div class="info-row"><span>Service Fee:</span><strong id="confirm-fee"></strong></div><div class="info-row"><span>Total Deducted:</span><strong id="confirm-total"></strong></div><hr style="margin: 12px 0; border-top: 1px solid #eee;"><div class="info-row"><span>Remaining Balance:</span><strong id="confirm-balance"></strong></div><div class="info-row"><span>Date & Time:</span><strong id="confirm-datetime"></strong></div><div class="info-row" id="confirm-id-row" style="display: none;"><span id="confirm-id-label"></span><strong id="confirm-id-value" class="mono-font"></strong></div><div class="info-row" style="align-items: center;"><span>Transaction ID:</span><div style="display: flex; align-items: center; gap: 8px;"><strong id="confirm-tx-id" class="mono-font" style="font-size: 12px;"></strong><i class="fas fa-copy" id="confirm-copy-btn" style="cursor: pointer; color: var(--primary);"></i></div></div></div><button class="btn" id="confirmation-close-btn" style="margin-top: 25px;">Done</button></div></div>
@@ -222,7 +176,7 @@
     let html5QrCodeScanner = null;
     let activeQrInputId = null;
     let configFees = { sendMoneyFixedFee: 0.08, moneyOutPercentageFee: 0.0008 };
-    const allMainPages = ['login-page', 'home-page', 'public-payment-page'];
+    const allMainPages = ['login-page', 'home-page'];
     const pages = document.querySelectorAll('.page');
     
     function showMainContainer(pageId) {
@@ -239,106 +193,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const merchantUserId = urlParams.get('pay_to');
-        if (merchantUserId) {
-            handlePublicPayment(merchantUserId);
-        } else {
-            initializeAuthHandler();
-        }
+        // Normal app flow, no URL check needed
+        initializeAuthHandler();
     });
 
-    async function handlePublicPayment(merchantUserId) {
-        showMainContainer('public-payment-page');
-        const q = await db.collection('users').where('userId', '==', merchantUserId).limit(1).get();
-        if (q.empty) {
-            alert('Merchant not found.'); return;
-        }
-        const merchantDoc = q.docs[0];
-        const merchantData = merchantDoc.data();
-        document.getElementById('payment-merchant-name').textContent = merchantData.name;
-        document.getElementById('summary-merchant-id').textContent = merchantData.userId;
-
-        let paymentAmount = 0;
-
-        document.getElementById('payment-amount-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            paymentAmount = parseFloat(document.getElementById('payment-amount').value);
-            if (isNaN(paymentAmount) || paymentAmount <= 0) {
-                alert('Please enter a valid amount.'); return;
-            }
-            document.getElementById('summary-amount').textContent = `$${paymentAmount.toFixed(2)}`;
-            document.getElementById('payment-step-1').style.display = 'none';
-            document.getElementById('payment-step-2').style.display = 'block';
-        });
-
-        document.getElementById('summary-copy-btn').addEventListener('click', () => {
-             copyToClipboard(merchantData.userId, 'Merchant ID');
-        });
-
-        // --- MAJOR CHANGE: Securely verify the transaction ---
-        document.getElementById('payment-confirm-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('confirm-payment-btn');
-            const userTxId = document.getElementById('payment-tx-id').value.trim();
-            if (!userTxId) return alert('Please provide a Transaction ID.');
-
-            toggleButtonLoading(btn, true);
-
-            try {
-                const paymentRef = db.collection('url_payments').doc(userTxId);
-                const paymentDoc = await paymentRef.get();
-
-                // 1. Check if the payment voucher exists
-                if (!paymentDoc.exists) {
-                    throw new Error('Invalid Transaction ID. No such payment initiated.');
-                }
-
-                const paymentData = paymentDoc.data();
-
-                // 2. Check if the payment is for this merchant
-                if (paymentData.recipientId !== merchantData.userId) {
-                    throw new Error('This Transaction ID is not for this merchant.');
-                }
-                
-                // 3. Check if the amount matches
-                if (paymentData.amount !== paymentAmount) {
-                    throw new Error(`Amount mismatch. The transaction was for $${paymentData.amount.toFixed(2)}, but you entered $${paymentAmount.toFixed(2)}.`);
-                }
-
-                // 4. Check if the payment is still pending (not already claimed)
-                if (paymentData.status !== 'pending') {
-                    throw new Error('This payment has already been claimed or was cancelled.');
-                }
-
-                // All checks passed! Proceed with claiming the payment in a transaction.
-                await db.runTransaction(async (t) => {
-                    const merchantRef = db.collection('users').doc(merchantDoc.id);
-                    
-                    // Update merchant's balance
-                    t.update(merchantRef, { balance: firebase.firestore.FieldValue.increment(paymentAmount) });
-                    
-                    // Mark the payment voucher as 'claimed' so it can't be used again
-                    t.update(paymentRef, { status: 'claimed', claimedAt: firebase.firestore.Timestamp.now() });
-                });
-                
-                // Add a transaction record to the merchant's own transaction history
-                await addTransaction(merchantDoc.id, 'credit', paymentAmount, `Received from ${paymentData.senderName || 'WMT User'}`, 'fa-link', userTxId);
-
-                // Show success screen
-                document.getElementById('payment-step-2').style.display = 'none';
-                document.getElementById('payment-step-3').style.display = 'block';
-
-            } catch (error) {
-                alert('Payment Verification Failed: ' + error.message);
-            } finally {
-                toggleButtonLoading(btn, false);
-            }
-        });
-    }
-
-    // --- The rest of the JavaScript remains the same as the previous version ---
-    
     function initializeAuthHandler() {
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -368,34 +226,268 @@
             }
         });
     }
+
+    function listenForFeeUpdates() {
+        db.collection('settings').doc('fees').onSnapshot((doc) => {
+            if (doc.exists) {
+                const allFees = doc.data();
+                const feesForType = allFees.merchant || allFees.user; 
+                if (feesForType) {
+                    configFees.sendMoneyFixedFee = feesForType.sendMoneyFixedFee || 0.08;
+                    configFees.moneyOutPercentageFee = feesForType.moneyOutPercentageFee || 0.0008;
+                }
+            }
+        });
+    }
     
-    function listenForFeeUpdates() { db.collection('settings').doc('fees').onSnapshot((doc) => { if (doc.exists) { const allFees = doc.data(); const feesForType = allFees.merchant || allFees.user; if (feesForType) { configFees.sendMoneyFixedFee = feesForType.sendMoneyFixedFee || 0.08; configFees.moneyOutPercentageFee = feesForType.moneyOutPercentageFee || 0.0008; } } }); }
-    function initializeAppUI() { showMainContainer('home-page'); listenForFeeUpdates(); setupEventListeners(); handleHashChange(); updateAllUI(); }
-    function updateAllUI() { if (!currentUser) return; const balance = (currentUser.balance || 0).toFixed(2); document.getElementById('home-balance').textContent = balance; ['header-profile-img', 'profile-image-view'].forEach(id => document.getElementById(id).src = currentUser.profileImg); document.getElementById('profile-name').textContent = currentUser.name; document.getElementById('profile-email').textContent = currentUser.email; document.getElementById('profile-user-id').value = currentUser.userId; const paymentUrl = `${window.location.origin}${window.location.pathname}?pay_to=${currentUser.userId}`; document.getElementById('public-payment-url').value = paymentUrl; loadTransactions(); }
-    function setupEventListeners() { document.getElementById('login-form').addEventListener('submit', (e) => { e.preventDefault(); const btn = document.getElementById('login-btn'); toggleButtonLoading(btn, true); auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value).catch(err => alert('Login failed: ' + err.message)).finally(() => toggleButtonLoading(btn, false)); }); document.getElementById('logout-btn').addEventListener('click', () => { auth.signOut().then(() => { window.location.hash = ''; window.location.reload(); }); }); const closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('sidebar-overlay').classList.remove('active'); }; document.getElementById('menu-toggle').addEventListener('click', () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('sidebar-overlay').classList.add('active'); }); ['sidebar-close', 'sidebar-overlay'].forEach(id => document.getElementById(id).addEventListener('click', closeSidebar)); document.querySelectorAll('.sidebar-link').forEach(link => { link.addEventListener('click', (e) => { closeSidebar(); }); }); document.querySelectorAll('.service-card').forEach(card => { card.addEventListener('click', () => { window.location.hash = card.dataset.service; }); }); window.addEventListener('hashchange', handleHashChange); }
-    function handleHashChange() { const pageId = window.location.hash.substring(1) || 'home'; showPage(pageId); }
-    function showPage(pageId) { if (!document.getElementById(`${pageId}-content`)) { console.warn(`Page content for '${pageId}' not found. Defaulting to home.`); window.location.hash = 'home'; return; } pages.forEach(p => p.classList.remove('active')); document.getElementById(`${pageId}-content`).classList.add('active'); document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.dataset.page === pageId)); }
-    async function addTransaction(docId, type, amount, description, icon, existingTxId = null) { if (!docId) return null; const transactionData = { type, amount, description, icon, date: firebase.firestore.Timestamp.now() }; try { const collectionRef = db.collection('users').doc(docId).collection('transactions'); let docRef; if (existingTxId) { docRef = collectionRef.doc(existingTxId); await docRef.set(transactionData); } else { docRef = await collectionRef.add(transactionData); } await docRef.update({ transactionId: docRef.id }); return docRef.id; } catch (error) { console.error(`Error creating transaction for user ${docId}:`, error); return null; } }
-    function loadTransactions() { if (!currentUser) return; db.collection('users').doc(currentUser.uid).collection('transactions').orderBy('date', 'desc').limit(20).onSnapshot(querySnapshot => { const recentList = document.getElementById('recent-transactions'); const allList = document.getElementById('all-transactions'); recentList.innerHTML = ''; allList.innerHTML = ''; if (querySnapshot.empty) { const noTxMsg = "<li><p style='text-align:center; color: var(--gray);'>No transactions yet.</p></li>"; recentList.innerHTML = noTxMsg; allList.innerHTML = noTxMsg; return; } querySnapshot.docs.forEach((doc, index) => { const txElement = createTransactionElement(doc.data()); allList.appendChild(txElement.cloneNode(true)); if (index < 5) recentList.appendChild(txElement); }); }, error => console.error("Error loading transactions:", error)); }
-    function createTransactionElement(tx) { const li = document.createElement('li'); li.className = 'transaction-item'; const isCredit = tx.type === 'credit'; const txId = tx.transactionId || 'N/A'; const shortTxId = txId.length > 8 ? txId.substring(0, 8) + '...' : txId; li.innerHTML = `<div class="transaction-info"><div class="transaction-icon" style="background-color: ${isCredit ? 'var(--secondary)' : 'var(--primary)'};"><i class="fas ${tx.icon}"></i></div><div class="transaction-details"><h4>${tx.description}</h4><p>${tx.date.toDate().toLocaleString()}</p><div class="transaction-id-container"><span>ID: ${shortTxId}</span><i class="fas fa-copy copy-icon" onclick="copyToClipboard('${txId}', 'Transaction ID')"></i></div></div></div><div class="transaction-amount ${tx.type}">${isCredit ? '+' : '-'}$${tx.amount.toFixed(2)}</div>`; return li; }
-    async function handleTransaction(form, button, passwordInput, action) { toggleButtonLoading(button, true); try { const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, passwordInput.value); await auth.currentUser.reauthenticateWithCredential(credential); await action(); if (form) form.reset(); } catch (error) { alert(`Error: ${error.message}`); } finally { if (passwordInput) passwordInput.value = ''; toggleButtonLoading(button, false); } }
-    document.getElementById('redeem-btn').addEventListener('click', (e) => { const btn = e.target, form = btn.closest('.form-page'); const code = document.getElementById('redeem-code').value.trim().toUpperCase(), password = document.getElementById('redeem-password').value; if (!code || !password) return alert('Please fill all fields.'); handleTransaction(form, btn, {value: password}, async () => { const q = await db.collection('redeem_codes').where('code', '==', code).where('password', '==', password).limit(1).get(); if (q.empty) throw new Error('Invalid code or password.'); const doc = q.docs[0]; if (doc.data().isUsed) throw new Error('Code already used.'); const amount = doc.data().amount; await db.runTransaction(async t => { t.update(db.collection('users').doc(currentUser.uid), { balance: firebase.firestore.FieldValue.increment(amount) }); t.update(doc.ref, { isUsed: true, usedBy: currentUser.uid, usedAt: firebase.firestore.Timestamp.now() }); }); const txId = await addTransaction(currentUser.uid, 'credit', amount, `Redeemed Code`, 'fa-plus-circle'); showConfirmationPopup({ amount, fee: 0, txId, finalBalance: currentUser.balance, idLabel: "Redeem Code", idValue: code }); }); });
-    document.getElementById('send-money-form').addEventListener('submit', (e) => { e.preventDefault(); const form = e.target; const recipientId = document.getElementById('recipient-id').value.trim(), amount = parseFloat(document.getElementById('send-amount').value); const fee = configFees.sendMoneyFixedFee, total = amount + fee; if (total > currentUser.balance) return alert('Insufficient balance.'); handleTransaction(form, form.querySelector('button'), document.getElementById('send-password'), async () => { const q = await db.collection('users').where('userId', '==', recipientId).limit(1).get(); if (q.empty) throw new Error('Recipient not found.'); const recipientDoc = q.docs[0]; const senderTxId = await addTransaction(currentUser.uid, 'debit', amount, `Sent to ${recipientDoc.data().name}`, 'fa-paper-plane'); if (senderTxId) { await addTransaction(recipientDoc.id, 'credit', amount, `Received from ${currentUser.name}`, 'fa-wallet', senderTxId); await db.runTransaction(async t => { t.update(db.collection('users').doc(currentUser.uid), { balance: firebase.firestore.FieldValue.increment(-total) }); t.update(db.collection('users').doc(recipientDoc.id), { balance: firebase.firestore.FieldValue.increment(amount) }); }); showConfirmationPopup({ amount, fee, txId: senderTxId, finalBalance: currentUser.balance, idLabel: "Recipient ID", idValue: recipientDoc.data().userId }); } }); });
-    document.getElementById('money-out-form').addEventListener('submit', (e) => { e.preventDefault(); const form = e.target; const agentId = document.getElementById('agent-id').value.trim(), amount = parseFloat(document.getElementById('money-out-amount').value); if (!agentId.startsWith("AWMT")) return alert('Invalid Agent ID.'); const fee = amount * configFees.moneyOutPercentageFee, total = amount + fee; if (total > currentUser.balance) return alert('Insufficient balance.'); handleTransaction(form, form.querySelector('button'), document.getElementById('money-out-password'), async () => { const q = await db.collection('users').where('userId', '==', agentId).limit(1).get(); if (q.empty) throw new Error('Agent not found.'); const agentDoc = q.docs[0]; const senderTxId = await addTransaction(currentUser.uid, 'debit', amount, `Money Out to ${agentDoc.data().name}`, 'fa-money-bill-wave'); if(senderTxId){ await addTransaction(agentDoc.id, 'credit', amount, `Received from ${currentUser.name}`, 'fa-wallet', senderTxId); await db.runTransaction(async t => { t.update(db.collection('users').doc(currentUser.uid), { balance: firebase.firestore.FieldValue.increment(-total) }); t.update(db.collection('users').doc(agentDoc.id), { balance: firebase.firestore.FieldValue.increment(amount) }); }); showConfirmationPopup({ amount, fee, txId: senderTxId, finalBalance: currentUser.balance, idLabel: "Agent ID", idValue: agentDoc.data().userId }); } }); });
+    function initializeAppUI() {
+        showMainContainer('home-page');
+        listenForFeeUpdates();
+        setupEventListeners();
+        handleHashChange(); // Load initial page based on hash
+        updateAllUI();
+    }
+
+    function updateAllUI() {
+        if (!currentUser) return;
+        const balance = (currentUser.balance || 0).toFixed(2);
+        document.getElementById('home-balance').textContent = balance;
+        ['header-profile-img', 'profile-image-view'].forEach(id => document.getElementById(id).src = currentUser.profileImg);
+        document.getElementById('profile-name').textContent = currentUser.name;
+        document.getElementById('profile-email').textContent = currentUser.email;
+        document.getElementById('profile-user-id').value = currentUser.userId;
+        loadTransactions();
+    }
+    
+    function setupEventListeners() {
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            toggleButtonLoading(btn, true);
+            auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value)
+                .catch(err => alert('Login failed: ' + err.message))
+                .finally(() => toggleButtonLoading(btn, false));
+        });
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.hash = ''; // Clear hash on logout
+                window.location.reload(); // Reload to clear state
+            });
+        });
+        const closeSidebar = () => {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebar-overlay').classList.remove('active');
+        };
+        document.getElementById('menu-toggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.add('active');
+            document.getElementById('sidebar-overlay').classList.add('active');
+        });
+        ['sidebar-close', 'sidebar-overlay'].forEach(id => document.getElementById(id).addEventListener('click', closeSidebar));
+        
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                // Let the hashchange event handle the navigation
+                closeSidebar();
+            });
+        });
+
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Use hash for navigation
+                window.location.hash = card.dataset.service;
+            });
+        });
+        
+        document.getElementById('view-all-transactions').addEventListener('click', (e) => {
+             e.preventDefault();
+             window.location.hash = 'transactions';
+        });
+
+        // Back button functionality
+        window.addEventListener('hashchange', handleHashChange);
+    }
+    
+    // Function to handle hash changes for back button and navigation
+    function handleHashChange() {
+        const pageId = window.location.hash.substring(1) || 'home'; // Default to home
+        showPage(pageId);
+    }
+
+    function showPage(pageId) {
+        if (!document.getElementById(`${pageId}-content`)) {
+            console.warn(`Page content for '${pageId}' not found. Defaulting to home.`);
+            window.location.hash = 'home'; // Reset hash if page doesn't exist
+            return;
+        }
+        pages.forEach(p => p.classList.remove('active'));
+        document.getElementById(`${pageId}-content`).classList.add('active');
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.dataset.page === pageId));
+    }
+
+    async function addTransaction(docId, type, amount, description, icon, existingTxId = null) {
+        if (!docId) return null;
+        const transactionData = { type, amount, description, icon, date: firebase.firestore.Timestamp.now() };
+        try {
+            const collectionRef = db.collection('users').doc(docId).collection('transactions');
+            let docRef;
+            if (existingTxId) {
+                docRef = collectionRef.doc(existingTxId);
+                await docRef.set(transactionData);
+            } else {
+                docRef = await collectionRef.add(transactionData);
+            }
+            await docRef.update({ transactionId: docRef.id });
+            return docRef.id;
+        } catch (error) {
+            console.error(`Error creating transaction for user ${docId}:`, error);
+            return null;
+        }
+    }
+
+    function loadTransactions() { 
+        if (!currentUser) return;
+        db.collection('users').doc(currentUser.uid).collection('transactions').orderBy('date', 'desc').limit(20)
+          .onSnapshot(querySnapshot => {
+            const recentList = document.getElementById('recent-transactions');
+            const allList = document.getElementById('all-transactions');
+            recentList.innerHTML = ''; allList.innerHTML = '';
+            if (querySnapshot.empty) {
+                const noTxMsg = "<li><p style='text-align:center; color: var(--gray);'>No transactions yet.</p></li>";
+                recentList.innerHTML = noTxMsg; allList.innerHTML = noTxMsg; return;
+            }
+            querySnapshot.docs.forEach((doc, index) => {
+                const txElement = createTransactionElement(doc.data());
+                allList.appendChild(txElement.cloneNode(true));
+                if (index < 5) recentList.appendChild(txElement);
+            });
+        }, error => console.error("Error loading transactions:", error));
+    }
+
+    function createTransactionElement(tx) {
+        const li = document.createElement('li'); li.className = 'transaction-item';
+        const isCredit = tx.type === 'credit';
+        const txId = tx.transactionId || 'N/A';
+        const shortTxId = txId.length > 8 ? txId.substring(0, 8) + '...' : txId;
+        li.innerHTML = `<div class="transaction-info"><div class="transaction-icon" style="background-color: ${isCredit ? 'var(--secondary)' : 'var(--primary)'};"><i class="fas ${tx.icon}"></i></div><div class="transaction-details"><h4>${tx.description}</h4><p>${tx.date.toDate().toLocaleString()}</p><div class="transaction-id-container"><span>ID: ${shortTxId}</span><i class="fas fa-copy copy-icon" onclick="copyToClipboard('${txId}', 'Transaction ID')"></i></div></div></div><div class="transaction-amount ${tx.type}">${isCredit ? '+' : '-'}$${tx.amount.toFixed(2)}</div>`;
+        return li;
+    }
+    
+    async function handleTransaction(form, button, passwordInput, action) {
+        toggleButtonLoading(button, true);
+        try {
+            const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, passwordInput.value);
+            await auth.currentUser.reauthenticateWithCredential(credential);
+            await action();
+            if (form) form.reset();
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        } finally {
+            if (passwordInput) passwordInput.value = '';
+            toggleButtonLoading(button, false);
+        }
+    }
+    
+    document.getElementById('redeem-btn').addEventListener('click', (e) => {
+        const btn = e.target, form = btn.closest('.form-page');
+        const code = document.getElementById('redeem-code').value.trim().toUpperCase(), password = document.getElementById('redeem-password').value;
+        if (!code || !password) return alert('Please fill all fields.');
+        handleTransaction(form, btn, {value: password}, async () => { 
+            const q = await db.collection('redeem_codes').where('code', '==', code).where('password', '==', password).limit(1).get();
+            if (q.empty) throw new Error('Invalid code or password.');
+            const doc = q.docs[0]; if (doc.data().isUsed) throw new Error('Code already used.');
+            const amount = doc.data().amount;
+            await db.runTransaction(async t => {
+                t.update(db.collection('users').doc(currentUser.uid), { balance: firebase.firestore.FieldValue.increment(amount) });
+                t.update(doc.ref, { isUsed: true, usedBy: currentUser.uid, usedAt: firebase.firestore.Timestamp.now() });
+            });
+            const txId = await addTransaction(currentUser.uid, 'credit', amount, `Redeemed Code`, 'fa-plus-circle');
+            showConfirmationPopup({ amount, fee: 0, txId, finalBalance: currentUser.balance, idLabel: "Redeem Code", idValue: code });
+        });
+    });
+
+    document.getElementById('send-money-form').addEventListener('submit', (e) => { 
+        e.preventDefault(); const form = e.target;
+        const recipientId = document.getElementById('recipient-id').value.trim(), amount = parseFloat(document.getElementById('send-amount').value);
+        const fee = configFees.sendMoneyFixedFee, total = amount + fee;
+        if (total > currentUser.balance) return alert('Insufficient balance.');
+        handleTransaction(form, form.querySelector('button'), document.getElementById('send-password'), async () => {
+            const q = await db.collection('users').where('userId', '==', recipientId).limit(1).get();
+            if (q.empty) throw new Error('Recipient not found.');
+            const recipientDoc = q.docs[0];
+            const senderTxId = await addTransaction(currentUser.uid, 'debit', amount, `Sent to ${recipientDoc.data().name}`, 'fa-paper-plane');
+            if (senderTxId) {
+                await addTransaction(recipientDoc.id, 'credit', amount, `Received from ${currentUser.name}`, 'fa-wallet', senderTxId);
+                await db.runTransaction(async t => {
+                    t.update(db.collection('users').doc(currentUser.uid), { balance: firebase.firestore.FieldValue.increment(-total) });
+                    t.update(db.collection('users').doc(recipientDoc.id), { balance: firebase.firestore.FieldValue.increment(amount) });
+                });
+                showConfirmationPopup({ amount, fee, txId: senderTxId, finalBalance: currentUser.balance, idLabel: "Recipient ID", idValue: recipientDoc.data().userId });
+            }
+        });
+    });
+
+    document.getElementById('money-out-form').addEventListener('submit', (e) => { 
+        e.preventDefault(); const form = e.target;
+        const agentId = document.getElementById('agent-id').value.trim(), amount = parseFloat(document.getElementById('money-out-amount').value);
+        if (!agentId.startsWith("AWMT")) return alert('Invalid Agent ID.');
+        const fee = amount * configFees.moneyOutPercentageFee, total = amount + fee;
+        if (total > currentUser.balance) return alert('Insufficient balance.');
+        handleTransaction(form, form.querySelector('button'), document.getElementById('money-out-password'), async () => {
+            const q = await db.collection('users').where('userId', '==', agentId).limit(1).get();
+            if (q.empty) throw new Error('Agent not found.');
+            const agentDoc = q.docs[0];
+            const senderTxId = await addTransaction(currentUser.uid, 'debit', amount, `Money Out to ${agentDoc.data().name}`, 'fa-money-bill-wave');
+            if(senderTxId){
+                await addTransaction(agentDoc.id, 'credit', amount, `Received from ${currentUser.name}`, 'fa-wallet', senderTxId);
+                await db.runTransaction(async t => {
+                    t.update(db.collection('users').doc(currentUser.uid), { balance: firebase.firestore.FieldValue.increment(-total) });
+                    t.update(db.collection('users').doc(agentDoc.id), { balance: firebase.firestore.FieldValue.increment(amount) });
+                });
+                showConfirmationPopup({ amount, fee, txId: senderTxId, finalBalance: currentUser.balance, idLabel: "Agent ID", idValue: agentDoc.data().userId });
+            }
+        });
+    });
+
     document.getElementById('send-amount').addEventListener('input', e => { const amount = parseFloat(e.target.value) || 0, fee = configFees.sendMoneyFixedFee; document.getElementById('send-fee-display').textContent = `Fee: $${fee.toFixed(2)}. Total: $${(amount + fee).toFixed(2)}`; document.getElementById('send-fee-display').style.display = amount > 0 ? 'block' : 'none'; });
     document.getElementById('money-out-amount').addEventListener('input', e => { const amount = parseFloat(e.target.value) || 0, fee = amount * configFees.moneyOutPercentageFee, feePercent = (configFees.moneyOutPercentageFee * 100).toFixed(2); document.getElementById('money-out-fee-display').textContent = `Fee (${feePercent}%): $${fee.toFixed(2)}. Total: $${(amount + fee).toFixed(2)}`; document.getElementById('money-out-fee-display').style.display = amount > 0 ? 'block' : 'none'; });
-    document.getElementById('change-password-btn').addEventListener('click', (e) => { const currentPass = document.getElementById('current-password').value, newPass = document.getElementById('new-password').value; if (newPass.length < 6) return alert("New password must be at least 6 characters."); handleTransaction(null, e.target, {value: currentPass}, async () => { await auth.currentUser.updatePassword(newPass); alert("Password changed successfully!"); document.getElementById('current-password').value = ''; document.getElementById('new-password').value = ''; }); });
+    
+    document.getElementById('change-password-btn').addEventListener('click', (e) => {
+        const currentPass = document.getElementById('current-password').value, newPass = document.getElementById('new-password').value;
+        if (newPass.length < 6) return alert("New password must be at least 6 characters.");
+        handleTransaction(null, e.target, {value: currentPass}, async () => {
+            await auth.currentUser.updatePassword(newPass);
+            alert("Password changed successfully!");
+            document.getElementById('current-password').value = ''; document.getElementById('new-password').value = '';
+        });
+    });
+    
     document.getElementById('upload-image-btn').addEventListener('click', () => document.getElementById('profile-image-upload').click());
     document.getElementById('profile-image-upload').addEventListener('change', (e) => { if (e.target.files[0]) handleImageUpload(e.target.files[0]); });
-    async function handleImageUpload(file) { const cloudName = 'dntvrm1wn', uploadPreset = 'ml_default', url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`; const formData = new FormData(); formData.append('file', file); formData.append('upload_preset', uploadPreset); const previewEl = document.getElementById('profile-image-view'), originalSrc = previewEl.src; previewEl.src = "https://i.gifer.com/ZZ5H.gif"; try { const res = await fetch(url, { method: 'POST', body: formData }); const data = await res.json(); if (data.secure_url) { await db.collection('users').doc(currentUser.uid).update({ profileImg: data.secure_url }); alert("Profile image updated!"); } else { throw new Error('Upload failed'); } } catch (error) { alert('Error uploading image.'); previewEl.src = originalSrc; } }
+    async function handleImageUpload(file) {
+        const cloudName = 'dntvrm1wn', uploadPreset = 'ml_default', url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+        const formData = new FormData(); formData.append('file', file); formData.append('upload_preset', uploadPreset);
+        const previewEl = document.getElementById('profile-image-view'), originalSrc = previewEl.src;
+        previewEl.src = "https://i.gifer.com/ZZ5H.gif";
+        try {
+            const res = await fetch(url, { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.secure_url) {
+                await db.collection('users').doc(currentUser.uid).update({ profileImg: data.secure_url });
+                alert("Profile image updated!");
+            } else { throw new Error('Upload failed'); }
+        } catch (error) { alert('Error uploading image.'); previewEl.src = originalSrc; }
+    }
+    
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
     document.getElementById('show-qr-btn').addEventListener('click', () => { generateQRCode(currentUser.userId); document.getElementById('modal-user-id').textContent = currentUser.userId; document.getElementById('qr-modal').style.display = 'flex'; });
+    
     function copyToClipboard(text, entity) { navigator.clipboard.writeText(text).then(() => alert(`${entity} copied!`)); }
     function generateQRCode(text) { const qrContainer = document.getElementById('modal-qrcode-container'); qrContainer.innerHTML = ''; const qr = qrcode(0, 'L'); qr.addData(text); qr.make(); qrContainer.innerHTML = qr.createImgTag(6, 10); }
     function startQrScanner(inputId) { activeQrInputId = inputId; document.getElementById('qr-scanner-modal').style.display = 'flex'; html5QrCodeScanner = new Html5Qrcode("qr-reader"); html5QrCodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, (decodedText) => { document.getElementById(activeQrInputId).value = decodedText; stopQrScanner(); }).catch(err => alert("Could not start QR scanner.")); }
     function stopQrScanner() { if (html5QrCodeScanner?.isScanning) html5QrCodeScanner.stop(); closeModal('qr-scanner-modal'); }
     document.getElementById('scan-qr-send').addEventListener('click', () => startQrScanner('recipient-id'));
     document.getElementById('scan-qr-out').addEventListener('click', () => startQrScanner('agent-id'));
+    
     const confirmationModal = document.getElementById('confirmation-modal');
     function showConfirmationPopup(details) { const { amount = 0, fee = 0, txId, finalBalance, idLabel, idValue } = details; document.getElementById('confirm-amount').textContent = `$${amount.toFixed(2)}`; document.getElementById('confirm-fee').textContent = `$${fee.toFixed(2)}`; document.getElementById('confirm-total').textContent = `$${(amount + fee).toFixed(2)}`; document.getElementById('confirm-balance').textContent = `$${finalBalance.toFixed(2)}`; document.getElementById('confirm-datetime').textContent = new Date().toLocaleString(); document.getElementById('confirm-tx-id').textContent = txId ? txId.substring(0, 10) + '...' : 'N/A'; document.getElementById('confirm-copy-btn').onclick = () => txId && copyToClipboard(txId, 'Transaction ID'); const idRow = document.getElementById('confirm-id-row'); if (idLabel && idValue) { document.getElementById('confirm-id-label').textContent = `${idLabel}:`; document.getElementById('confirm-id-value').textContent = idValue; idRow.style.display = 'flex'; } else { idRow.style.display = 'none'; } confirmationModal.style.display = 'flex'; }
     document.getElementById('confirmation-close-btn').addEventListener('click', () => closeModal('confirmation-modal'));
