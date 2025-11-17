@@ -20,8 +20,8 @@
         :root { --primary: #ea4335; --secondary: #34a853; --accent: #fbbc05; --light: #f8f9fa; --dark: #202124; --gray: #5f6368; }
         body { background-color: #f5f7fa; color: var(--dark); line-height: 1.6; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-        .auth-container { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #c5372a 0%, #a02d22 100%); padding: 20px; }
-        .auth-card { background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; padding: 30px; }
+        .auth-container, .public-payment-container { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #c5372a 0%, #a02d22 100%); padding: 20px; }
+        .auth-card, .payment-card { background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; padding: 30px; }
         .logo { text-align: center; margin-bottom: 25px; }
         .logo h1 { color: var(--primary); font-size: 28px; margin-bottom: 5px; }
         .logo p { color: var(--gray); font-size: 14px; }
@@ -36,7 +36,7 @@
         @keyframes btn-loader { to { transform: rotate(1turn); } }
         .btn-secondary { background: var(--secondary); }
         .btn-secondary:hover { background: #2d9355; }
-        .home-container { display: none; }
+        .home-container, .public-payment-container { display: none; }
         .header { background: white; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; }
         .header-content { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; }
         .menu-toggle { font-size: 24px; color: var(--dark); cursor: pointer; }
@@ -100,9 +100,52 @@
         .modal-content { background: white; padding: 25px; border-radius: 12px; text-align: center; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-width: 90%; width: 400px; }
         .modal-close { position: absolute; top: 10px; right: 15px; font-size: 28px; color: var(--gray); cursor: pointer; font-weight: bold; }
         .confirmation-details .info-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; }
+        .payment-summary { list-style: none; text-align: left; margin: 20px 0; }
+        .payment-summary li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .payment-summary li span { color: var(--gray); }
     </style>
 </head>
 <body>
+    <!-- Public Payment Flow -->
+    <div class="public-payment-container" id="public-payment-page">
+        <div class="payment-card">
+            <div class="logo"><h1>WMT Payment</h1><p>to <strong id="payment-merchant-name">Merchant</strong></p></div>
+            <!-- Step 1: Amount -->
+            <div id="payment-step-1">
+                <h2>Enter Amount</h2>
+                <form id="payment-amount-form">
+                    <div class="form-group">
+                        <label for="payment-amount">Amount ($)</label>
+                        <input type="number" step="0.01" class="form-control" id="payment-amount" placeholder="0.00" required>
+                    </div>
+                    <button type="submit" class="btn">Next</button>
+                </form>
+            </div>
+            <!-- Step 2: Confirmation -->
+            <div id="payment-step-2" style="display: none;">
+                <h2>Payment Summary</h2>
+                <ul class="payment-summary">
+                    <li><span>Amount:</span><strong id="summary-amount"></strong></li>
+                    <li><span>Merchant ID (PWMT):</span><strong id="summary-merchant-id"></strong> <i class="fas fa-copy copy-icon" id="summary-copy-btn"></i></li>
+                </ul>
+                <form id="payment-confirm-form">
+                    <div class="form-group">
+                        <label for="payment-tx-id">Transaction ID</label>
+                        <input type="text" class="form-control" id="payment-tx-id" placeholder="Enter your transaction ID to confirm" required>
+                    </div>
+                    <button type="submit" class="btn" id="confirm-payment-btn">Confirm Payment</button>
+                </form>
+            </div>
+             <!-- Step 3: Success -->
+            <div id="payment-step-3" style="display: none; text-align: center;">
+                 <i class="fas fa-check-circle" style="font-size: 60px; color: var(--secondary); margin-bottom: 20px;"></i>
+                 <h2>Payment Complete!</h2>
+                 <p>Your payment has been successfully recorded.</p>
+                 <p style="margin-top: 15px;"><a href="/">Go back to home</a></p>
+            </div>
+        </div>
+    </div>
+
     <!-- Login Page -->
     <div class="auth-container" id="login-page">
         <div class="auth-card">
@@ -130,10 +173,11 @@
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header"><h3>Menu</h3><div class="sidebar-close" id="sidebar-close"><i class="fas fa-times"></i></div></div>
             <ul class="sidebar-menu">
-                <li><a href="#" class="sidebar-link active" data-page="home"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="#" class="sidebar-link" data-page="transactions"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
-                <li><a href="#" class="sidebar-link" data-page="profile"><i class="fas fa-user"></i> My Profile</a></li>
-                <li><a href="#" class="sidebar-link" data-page="settings"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="#home" class="sidebar-link active" data-page="home"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#transactions" class="sidebar-link" data-page="transactions"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
+                <li><a href="#url-payment" class="sidebar-link" data-page="url-payment"><i class="fas fa-link"></i> URL Payment</a></li>
+                <li><a href="#profile" class="sidebar-link" data-page="profile"><i class="fas fa-user"></i> My Profile</a></li>
+                <li><a href="#settings" class="sidebar-link" data-page="settings"><i class="fas fa-cog"></i> Settings</a></li>
                 <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </div>
@@ -141,8 +185,9 @@
 
         <main class="main-content">
             <div class="container">
-                <div class="page active" id="home-content"><div class="balance-card"><h3>Available Balance</h3><div class="balance-amount">$<span id="home-balance">0.00</span></div></div><div class="services-grid"><div class="service-card add-money" data-service="add-money"><div class="service-icon"><i class="fas fa-plus"></i></div><h4>Add Money</h4></div><div class="service-card send-money" data-service="send-money"><div class="service-icon"><i class="fas fa-paper-plane"></i></div><h4>Send Money</h4></div><div class="service-card money-out" data-service="money-out"><div class="service-icon"><i class="fas fa-money-bill-wave"></i></div><h4>Money Out</h4></div></div><div class="transactions-section"><div class="section-header"><h3>Recent Transactions</h3><a href="#" class="view-all" id="view-all-transactions">View All</a></div><ul class="transaction-list" id="recent-transactions"></ul></div></div>
+                <div class="page active" id="home-content"><div class="balance-card"><h3>Available Balance</h3><div class="balance-amount">$<span id="home-balance">0.00</span></div></div><div class="services-grid"><div class="service-card add-money" data-service="add-money"><div class="service-icon"><i class="fas fa-plus"></i></div><h4>Add Money</h4></div><div class="service-card send-money" data-service="send-money"><div class="service-icon"><i class="fas fa-paper-plane"></i></div><h4>Send Money</h4></div><div class="service-card money-out" data-service="money-out"><div class="service-icon"><i class="fas fa-money-bill-wave"></i></div><h4>Money Out</h4></div></div><div class="transactions-section"><div class="section-header"><h3>Recent Transactions</h3><a href="#transactions" class="view-all" id="view-all-transactions">View All</a></div><ul class="transaction-list" id="recent-transactions"></ul></div></div>
                 <div class="page" id="transactions-content"><div class="form-page"><h2>All Transactions</h2><div class="transactions-section"><ul class="transaction-list" id="all-transactions"></ul></div></div></div>
+                <div class="page" id="url-payment-content"><div class="form-page"><h2>Public Payment URL</h2><p style="margin-bottom: 20px; color: var(--gray);">Share this URL with your customers to receive payments directly.</p><div class="form-group"><label>Your Unique Payment URL</label><div class="user-id-display"><input type="text" class="form-control" id="public-payment-url" readonly><button class="copy-btn" onclick="copyToClipboard(document.getElementById('public-payment-url').value, 'Payment URL')">Copy</button></div></div></div></div>
                 <div class="page" id="profile-content"><div class="form-page"><h2>My Profile</h2><div class="profile-upload"><img src="" alt="Profile" class="profile-image" id="profile-image-view"><input type="file" id="profile-image-upload" accept="image/*" style="display: none;"><button type="button" class="upload-btn" id="upload-image-btn">Change Profile Image</button></div><button class="btn btn-secondary" id="show-qr-btn" style="margin-bottom: 20px;"><i class="fas fa-qrcode"></i> Show My Payment QR Code</button><div class="form-group"><label>Business Name</label><div class="form-control" style="background: #f9f9f9;" id="profile-name"></div></div><div class="form-group"><label>Merchant ID (PWMT)</label><div class="user-id-display"><input type="text" class="form-control" id="profile-user-id" readonly><button class="copy-btn" onclick="copyToClipboard(document.getElementById('profile-user-id').value, 'Merchant ID')">Copy</button></div></div><div class="form-group"><label>Email</label><div class="form-control" style="background: #f9f9f9;" id="profile-email"></div></div></div></div>
                 <div class="page" id="settings-content"><div class="form-page"><h2>Settings</h2><h3>Change Password</h3><div class="form-group"><label for="current-password">Current Password</label><input type="password" class="form-control" id="current-password"></div><div class="form-group"><label for="new-password">New Password (min. 6 characters)</label><input type="password" class="form-control" id="new-password"></div><button class="btn" id="change-password-btn">Change Password</button></div></div>
                 <div class="page" id="add-money-content"><div class="form-page"><h2>Add Money</h2><div class="form-group"><label for="redeem-code">Redeem Code</label><input type="text" class="form-control" id="redeem-code" placeholder="Enter redeem code from admin"></div><div class="form-group"><label for="redeem-password">Code Password</label><input type="password" class="form-control" id="redeem-password" placeholder="Enter password for the code"></div><button class="btn" id="redeem-btn">Redeem Code</button></div></div>
@@ -176,11 +221,15 @@
     let html5QrCodeScanner = null;
     let activeQrInputId = null;
     let configFees = { sendMoneyFixedFee: 0.08, moneyOutPercentageFee: 0.0008 };
-    const allMainPages = ['login-page', 'home-page'];
+    const allMainPages = ['login-page', 'home-page', 'public-payment-page'];
     const pages = document.querySelectorAll('.page');
     
     function showMainContainer(pageId) {
-        allMainPages.forEach(p => { document.getElementById(p).style.display = (p === pageId) ? (p === 'home-page' ? 'block' : 'flex') : 'none'; });
+        allMainPages.forEach(p => { 
+            const el = document.getElementById(p);
+            if (el) el.style.display = (p === pageId) ? 'flex' : 'none';
+        });
+        if (pageId === 'home-page') document.getElementById(pageId).style.display = 'block';
     }
 
     function toggleButtonLoading(btn, isLoading) {
@@ -188,35 +237,116 @@
         btn.disabled = isLoading;
     }
 
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            db.collection('users').where("email", "==", user.email).limit(1).onSnapshot(snapshot => {
-                if (!snapshot.empty) {
-                    const userDoc = snapshot.docs[0];
-                    const userData = userDoc.data();
-                    if (userData.userType !== 'merchant') {
-                        alert("Access Denied. This login portal is for merchants only.");
-                        auth.signOut(); return;
-                    }
-                    currentUser = { uid: userDoc.id, auth_uid: user.uid, ...userData };
-                    if (document.getElementById('home-page').style.display !== 'block') initializeAppUI();
-                    else updateAllUI();
-                } else {
-                    console.error("User data not found in Firestore for email:", user.email);
-                    alert("Your user data was not found. Please contact admin.");
-                    auth.signOut();
-                }
-            }, error => {
-                console.error("Error fetching user data:", error);
-                alert("An error occurred while fetching your data. It might be a permission issue.");
-                auth.signOut();
-            });
+    // --- NEW: Public Payment URL Handler ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const merchantUserId = urlParams.get('pay_to');
+        if (merchantUserId) {
+            handlePublicPayment(merchantUserId);
         } else {
-            currentUser = null;
-            showMainContainer('login-page');
-            if (document.getElementById('login-form')) document.getElementById('login-form').reset();
+            // Normal app flow
+            initializeAuthHandler();
         }
     });
+
+    async function handlePublicPayment(merchantUserId) {
+        showMainContainer('public-payment-page');
+        const q = await db.collection('users').where('userId', '==', merchantUserId).limit(1).get();
+        if (q.empty) {
+            alert('Merchant not found.'); return;
+        }
+        const merchantDoc = q.docs[0];
+        const merchantData = merchantDoc.data();
+        document.getElementById('payment-merchant-name').textContent = merchantData.name;
+        document.getElementById('summary-merchant-id').textContent = merchantData.userId;
+
+        let paymentAmount = 0;
+
+        document.getElementById('payment-amount-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            paymentAmount = parseFloat(document.getElementById('payment-amount').value);
+            if (isNaN(paymentAmount) || paymentAmount <= 0) {
+                alert('Please enter a valid amount.'); return;
+            }
+            document.getElementById('summary-amount').textContent = `$${paymentAmount.toFixed(2)}`;
+            document.getElementById('payment-step-1').style.display = 'none';
+            document.getElementById('payment-step-2').style.display = 'block';
+        });
+
+        document.getElementById('summary-copy-btn').addEventListener('click', () => {
+             copyToClipboard(merchantData.userId, 'Merchant ID');
+        });
+
+        document.getElementById('payment-confirm-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('confirm-payment-btn');
+            toggleButtonLoading(btn, true);
+            const userTxId = document.getElementById('payment-tx-id').value.trim();
+
+            try {
+                // Check if this transaction ID has already been used for this merchant
+                const existingTxQuery = await db.collection('users').doc(merchantDoc.id).collection('transactions').where('transactionId', '==', userTxId).limit(1).get();
+                if (!existingTxQuery.empty) {
+                    throw new Error('This Transaction ID has already been used. Payment cannot be confirmed.');
+                }
+                
+                // If not used, proceed to add payment
+                await db.runTransaction(async t => {
+                    const merchantRef = db.collection('users').doc(merchantDoc.id);
+                    t.update(merchantRef, { balance: firebase.firestore.FieldValue.increment(paymentAmount) });
+                });
+
+                // Add a transaction record with the user-provided ID
+                const txRef = db.collection('users').doc(merchantDoc.id).collection('transactions').doc(userTxId);
+                await txRef.set({
+                    transactionId: userTxId,
+                    type: 'credit',
+                    amount: paymentAmount,
+                    description: 'Received via Payment URL',
+                    icon: 'fa-link',
+                    date: firebase.firestore.Timestamp.now()
+                });
+
+                document.getElementById('payment-step-2').style.display = 'none';
+                document.getElementById('payment-step-3').style.display = 'block';
+
+            } catch (error) {
+                alert('Payment failed: ' + error.message);
+            } finally {
+                toggleButtonLoading(btn, false);
+            }
+        });
+    }
+
+    function initializeAuthHandler() {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.collection('users').where("email", "==", user.email).limit(1).onSnapshot(snapshot => {
+                    if (!snapshot.empty) {
+                        const userDoc = snapshot.docs[0];
+                        const userData = userDoc.data();
+                        if (userData.userType !== 'merchant') {
+                            alert("Access Denied. This login portal is for merchants only.");
+                            auth.signOut(); return;
+                        }
+                        currentUser = { uid: userDoc.id, auth_uid: user.uid, ...userData };
+                        if (document.getElementById('home-page').style.display !== 'block') initializeAppUI();
+                        else updateAllUI();
+                    } else {
+                        console.error("User data not found in Firestore for email:", user.email);
+                        auth.signOut();
+                    }
+                }, error => {
+                    console.error("Error fetching user data:", error);
+                    auth.signOut();
+                });
+            } else {
+                currentUser = null;
+                showMainContainer('login-page');
+                if (document.getElementById('login-form')) document.getElementById('login-form').reset();
+            }
+        });
+    }
 
     function listenForFeeUpdates() {
         db.collection('settings').doc('fees').onSnapshot((doc) => {
@@ -235,7 +365,7 @@
         showMainContainer('home-page');
         listenForFeeUpdates();
         setupEventListeners();
-        showPage('home');
+        handleHashChange(); // Load initial page based on hash
         updateAllUI();
     }
 
@@ -247,6 +377,11 @@
         document.getElementById('profile-name').textContent = currentUser.name;
         document.getElementById('profile-email').textContent = currentUser.email;
         document.getElementById('profile-user-id').value = currentUser.userId;
+        
+        // --- NEW: Set Payment URL ---
+        const paymentUrl = `${window.location.origin}${window.location.pathname}?pay_to=${currentUser.userId}`;
+        document.getElementById('public-payment-url').value = paymentUrl;
+
         loadTransactions();
     }
     
@@ -259,7 +394,12 @@
                 .catch(err => alert('Login failed: ' + err.message))
                 .finally(() => toggleButtonLoading(btn, false));
         });
-        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.hash = ''; // Clear hash on logout
+                window.location.reload(); // Reload to clear state
+            });
+        });
         const closeSidebar = () => {
             document.getElementById('sidebar').classList.remove('active');
             document.getElementById('sidebar-overlay').classList.remove('active');
@@ -269,23 +409,42 @@
             document.getElementById('sidebar-overlay').classList.add('active');
         });
         ['sidebar-close', 'sidebar-overlay'].forEach(id => document.getElementById(id).addEventListener('click', closeSidebar));
+        
         document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.addEventListener('click', (e) => { e.preventDefault(); navigateTo(link.dataset.page); closeSidebar(); });
+            link.addEventListener('click', (e) => {
+                // Let the hashchange event handle the navigation
+                closeSidebar();
+            });
         });
-        document.querySelectorAll('.service-card').forEach(card => card.addEventListener('click', () => navigateTo(card.dataset.service)));
-        document.getElementById('view-all-transactions').addEventListener('click', (e) => { e.preventDefault(); navigateTo('transactions'); });
+
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Use hash for navigation
+                window.location.hash = card.dataset.service;
+            });
+        });
+        
+        // --- NEW: Back button functionality ---
+        window.addEventListener('hashchange', handleHashChange);
+    }
+    
+    // --- NEW: Function to handle hash changes for back button and navigation ---
+    function handleHashChange() {
+        const pageId = window.location.hash.substring(1) || 'home'; // Default to home
+        showPage(pageId);
     }
 
-    function navigateTo(pageId) { showPage(pageId); }
     function showPage(pageId) {
+        if (!document.getElementById(`${pageId}-content`)) {
+            console.warn(`Page content for '${pageId}' not found. Defaulting to home.`);
+            window.location.hash = 'home'; // Reset hash if page doesn't exist
+            return;
+        }
         pages.forEach(p => p.classList.remove('active'));
         document.getElementById(`${pageId}-content`).classList.add('active');
         document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.dataset.page === pageId));
     }
 
-    // =================================================================
-    // START OF FIX: addTransaction function for shared Transaction ID
-    // =================================================================
     async function addTransaction(docId, type, amount, description, icon, existingTxId = null) {
         if (!docId) return null;
         const transactionData = { type, amount, description, icon, date: firebase.firestore.Timestamp.now() };
@@ -293,24 +452,18 @@
             const collectionRef = db.collection('users').doc(docId).collection('transactions');
             let docRef;
             if (existingTxId) {
-                // If an ID is provided, use it to create the document
                 docRef = collectionRef.doc(existingTxId);
                 await docRef.set(transactionData);
             } else {
-                // Otherwise, create a new document with an auto-generated ID
                 docRef = await collectionRef.add(transactionData);
             }
-            // Ensure the transactionId field is set in the document
             await docRef.update({ transactionId: docRef.id });
-            return docRef.id; // Return the final transaction ID
+            return docRef.id;
         } catch (error) {
             console.error(`Error creating transaction for user ${docId}:`, error);
             return null;
         }
     }
-    // =================================================================
-    // END OF FIX
-    // =================================================================
 
     function loadTransactions() { 
         if (!currentUser) return;
@@ -355,7 +508,7 @@
         }
     }
     
-    // Redeem Money, Send Money, Money Out
+    // Redeem Money, Send Money, Money Out (No changes to these functions)
     document.getElementById('redeem-btn').addEventListener('click', (e) => {
         const btn = e.target, form = btn.closest('.form-page');
         const code = document.getElementById('redeem-code').value.trim().toUpperCase(), password = document.getElementById('redeem-password').value;
@@ -461,8 +614,6 @@
     function showConfirmationPopup(details) { const { amount = 0, fee = 0, txId, finalBalance, idLabel, idValue } = details; document.getElementById('confirm-amount').textContent = `$${amount.toFixed(2)}`; document.getElementById('confirm-fee').textContent = `$${fee.toFixed(2)}`; document.getElementById('confirm-total').textContent = `$${(amount + fee).toFixed(2)}`; document.getElementById('confirm-balance').textContent = `$${finalBalance.toFixed(2)}`; document.getElementById('confirm-datetime').textContent = new Date().toLocaleString(); document.getElementById('confirm-tx-id').textContent = txId ? txId.substring(0, 10) + '...' : 'N/A'; document.getElementById('confirm-copy-btn').onclick = () => txId && copyToClipboard(txId, 'Transaction ID'); const idRow = document.getElementById('confirm-id-row'); if (idLabel && idValue) { document.getElementById('confirm-id-label').textContent = `${idLabel}:`; document.getElementById('confirm-id-value').textContent = idValue; idRow.style.display = 'flex'; } else { idRow.style.display = 'none'; } confirmationModal.style.display = 'flex'; }
     document.getElementById('confirmation-close-btn').addEventListener('click', () => closeModal('confirmation-modal'));
     
-    // Initial setup
-    document.addEventListener('DOMContentLoaded', setupEventListeners);
     </script>
 </body>
 </html>
