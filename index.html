@@ -178,7 +178,8 @@
     let configFees = { sendMoneyFixedFee: 0.08, moneyOutPercentageFee: 0.0008 };
     const allMainPages = ['login-page', 'home-page'];
     const pages = document.querySelectorAll('.page');
-    
+    const confirmationModal = document.getElementById('confirmation-modal'); // FIXED: Defined the modal element
+
     function showMainContainer(pageId) {
         allMainPages.forEach(p => { 
             const el = document.getElementById(p);
@@ -418,21 +419,23 @@
     }
 
     function handleSendMoney(e) { 
-        e.preventDefault(); const form = e.target;
+        e.preventDefault(); 
+        const form = e.target;
         const recipientId = document.getElementById('recipient-id').value.trim();
         const amount = parseFloat(document.getElementById('send-amount').value);
 
-        // --- VALIDATION ADDED HERE ---
         if (recipientId.toUpperCase().startsWith("AWMT")) {
             alert("Agents (AWMT) cannot be sent money directly. Please use the 'Money Out' service for transactions with agents.");
-            return; // Stop the function here
+            return;
         }
 
         const fee = configFees.sendMoneyFixedFee, total = amount + fee;
         if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
         if (total > currentUser.balance) return alert('Insufficient balance.');
         
-        handleTransaction(form, form.querySelector('button'), document.getElementById('send-password'), async () => {
+        // FIXED: Targeted the correct 'Send Money' button for the loading animation
+        const sendMoneyButton = document.getElementById('send-money-btn');
+        handleTransaction(form, sendMoneyButton, document.getElementById('send-password'), async () => {
             const q = await db.collection('users').where('userId', '==', recipientId).limit(1).get();
             if (q.empty) throw new Error('Recipient not found.');
             const recipientDoc = q.docs[0];
@@ -455,7 +458,7 @@
         const fee = amount * configFees.moneyOutPercentageFee, total = amount + fee;
         if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
         if (total > currentUser.balance) return alert('Insufficient balance.');
-        handleTransaction(form, form.querySelector('button'), document.getElementById('money-out-password'), async () => {
+        handleTransaction(form, form.querySelector('button[type="submit"]'), document.getElementById('money-out-password'), async () => {
             const q = await db.collection('users').where('userId', '==', agentId).limit(1).get();
             if (q.empty) throw new Error('Agent not found.');
             const agentDoc = q.docs[0];
