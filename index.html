@@ -63,6 +63,7 @@
         .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .service-card { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px 15px; text-align: center; transition: all 0.3s; cursor: pointer; }
         .service-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .service-card.disabled { pointer-events: none; opacity: 0.5; } /* ADDED FOR SERVICE CONTROL */
         .service-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 20px; color: white; }
         .add-money .service-icon { background: #1a73e8; }
         .send-money .service-icon { background: var(--secondary); }
@@ -176,10 +177,10 @@
     let html5QrCodeScanner = null;
     let activeQrInputId = null;
     let configFees = { sendMoneyFixedFee: 0.08, moneyOutPercentageFee: 0.0008 };
+    let areServicesEnabled = true; // ADDED: Global variable for service status
     const allMainPages = ['login-page', 'home-page'];
     const pages = document.querySelectorAll('.page');
-    const confirmationModal = document.getElementById('confirmation-modal'); // FIXED: Defined the modal element
-
+    
     function showMainContainer(pageId) {
         allMainPages.forEach(p => { 
             const el = document.getElementById(p);
@@ -232,22 +233,59 @@
         });
     }
 
+    // --- MODIFIED: More specific and robust fee handling ---
     function listenForFeeUpdates() {
         db.collection('settings').doc('fees').onSnapshot((doc) => {
             if (doc.exists) {
                 const allFees = doc.data();
-                const feesForType = allFees.merchant || allFees.user; 
-                if (feesForType) {
-                    configFees.sendMoneyFixedFee = feesForType.sendMoneyFixedFee || 0.08;
-                    configFees.moneyOutPercentageFee = feesForType.moneyOutPercentageFee || 0.0008;
+                // Specifically get merchant fees
+                if (allFees.merchant) {
+                    if (typeof allFees.merchant.sendMoneyFixedFee === 'number') {
+                        configFees.sendMoneyFixedFee = allFees.merchant.sendMoneyFixedFee;
+                    }
+                    if (typeof allFees.merchant.moneyOutPercentageFee === 'number') {
+                        configFees.moneyOutPercentageFee = allFees.merchant.moneyOutPercentageFee;
+                    }
                 }
+            }
+        });
+    }
+
+    // --- ADDED: New function to listen for service status changes ---
+    function listenForServiceStatusUpdates() {
+        db.collection('settings').doc('status').onSnapshot((doc) => {
+            if (doc.exists) {
+                const status = doc.data();
+                // Check for 'merchantServicesEnabled'. Default to true if not set.
+                areServicesEnabled = status.merchantServicesEnabled !== false;
+                
+                // Enable or disable service buttons and cards based on the status
+                const serviceCards = document.querySelectorAll('.service-card');
+                const actionButtons = [
+                    document.getElementById('redeem-btn'),
+                    document.getElementById('send-money-btn'),
+                    document.getElementById('money-out-btn')
+                ];
+
+                if (areServicesEnabled) {
+                    serviceCards.forEach(card => card.classList.remove('disabled'));
+                    actionButtons.forEach(btn => { if(btn) btn.disabled = false; });
+                } else {
+                    serviceCards.forEach(card => card.classList.add('disabled'));
+                    actionButtons.forEach(btn => { if(btn) btn.disabled = true; });
+                    alert("Services are temporarily disabled by the admin.");
+                }
+            } else {
+                // If the status document doesn't exist, assume services are enabled.
+                areServicesEnabled = true;
             }
         });
     }
     
     function initializeAppUI() {
         showMainContainer('home-page');
-        listenForFeeUpdates();
+        listenForFeeUpdates(); // MODIFIED
+        listenForServiceStatusUpdates(); // ADDED
         handleHashChange();
         updateAllUI();
     }
@@ -296,6 +334,11 @@
 
         document.querySelectorAll('.service-card').forEach(card => {
             card.addEventListener('click', () => {
+                // ADDED: Check service status before navigating
+                if (!areServicesEnabled) {
+                    alert("Services are currently disabled by the admin.");
+                    return;
+                }
                 window.location.hash = card.dataset.service;
             });
         });
@@ -386,6 +429,11 @@
     }
     
     async function handleTransaction(form, button, passwordInput, action) {
+        // ADDED: Check service status before any transaction
+        if (!areServicesEnabled) {
+            alert("This action cannot be completed because services are temporarily disabled by the admin.");
+            return;
+        }
         toggleButtonLoading(button, true);
         try {
             const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, passwordInput.value);
@@ -419,23 +467,20 @@
     }
 
     function handleSendMoney(e) { 
-        e.preventDefault(); 
-        const form = e.target;
+        e.preventDefault(); const form = e.target;
         const recipientId = document.getElementById('recipient-id').value.trim();
         const amount = parseFloat(document.getElementById('send-amount').value);
 
         if (recipientId.toUpperCase().startsWith("AWMT")) {
             alert("Agents (AWMT) cannot be sent money directly. Please use the 'Money Out' service for transactions with agents.");
-            return;
+            return; 
         }
 
         const fee = configFees.sendMoneyFixedFee, total = amount + fee;
         if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
         if (total > currentUser.balance) return alert('Insufficient balance.');
         
-        // FIXED: Targeted the correct 'Send Money' button for the loading animation
-        const sendMoneyButton = document.getElementById('send-money-btn');
-        handleTransaction(form, sendMoneyButton, document.getElementById('send-password'), async () => {
+        handleTransaction(form, form.querySelector('button'), document.getElementById('send-password'), async () => {
             const q = await db.collection('users').where('userId', '==', recipientId).limit(1).get();
             if (q.empty) throw new Error('Recipient not found.');
             const recipientDoc = q.docs[0];
@@ -458,7 +503,7 @@
         const fee = amount * configFees.moneyOutPercentageFee, total = amount + fee;
         if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
         if (total > currentUser.balance) return alert('Insufficient balance.');
-        handleTransaction(form, form.querySelector('button[type="submit"]'), document.getElementById('money-out-password'), async () => {
+        handleTransaction(form, form.querySelector('button'), document.getElementById('money-out-password'), async () => {
             const q = await db.collection('users').where('userId', '==', agentId).limit(1).get();
             if (q.empty) throw new Error('Agent not found.');
             const agentDoc = q.docs[0];
@@ -505,7 +550,7 @@
     function startQrScanner(inputId) { activeQrInputId = inputId; document.getElementById('qr-scanner-modal').style.display = 'flex'; html5QrCodeScanner = new Html5Qrcode("qr-reader"); html5QrCodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, (decodedText) => { document.getElementById(activeQrInputId).value = decodedText; stopQrScanner(); }).catch(err => alert("Could not start QR scanner.")); }
     function stopQrScanner() { if (html5QrCodeScanner?.isScanning) html5QrCodeScanner.stop(); closeModal('qr-scanner-modal'); }
     
-    function showConfirmationPopup(details) { const { amount = 0, fee = 0, txId, finalBalance, idLabel, idValue } = details; document.getElementById('confirm-amount').textContent = `$${amount.toFixed(2)}`; document.getElementById('confirm-fee').textContent = `$${fee.toFixed(2)}`; document.getElementById('confirm-total').textContent = `$${(amount + fee).toFixed(2)}`; document.getElementById('confirm-balance').textContent = `$${finalBalance.toFixed(2)}`; document.getElementById('confirm-datetime').textContent = new Date().toLocaleString(); document.getElementById('confirm-tx-id').textContent = txId ? txId.substring(0, 10) + '...' : 'N/A'; document.getElementById('confirm-copy-btn').onclick = () => txId && copyToClipboard(txId, 'Transaction ID'); const idRow = document.getElementById('confirm-id-row'); if (idLabel && idValue) { document.getElementById('confirm-id-label').textContent = `${idLabel}:`; document.getElementById('confirm-id-value').textContent = idValue; idRow.style.display = 'flex'; } else { idRow.style.display = 'none'; } confirmationModal.style.display = 'flex'; }
+    function showConfirmationPopup(details) { const { amount = 0, fee = 0, txId, finalBalance, idLabel, idValue } = details; document.getElementById('confirm-amount').textContent = `$${amount.toFixed(2)}`; document.getElementById('confirm-fee').textContent = `$${fee.toFixed(2)}`; document.getElementById('confirm-total').textContent = `$${(amount + fee).toFixed(2)}`; document.getElementById('confirm-balance').textContent = `$${finalBalance.toFixed(2)}`; document.getElementById('confirm-datetime').textContent = new Date().toLocaleString(); document.getElementById('confirm-tx-id').textContent = txId ? txId.substring(0, 10) + '...' : 'N/A'; document.getElementById('confirm-copy-btn').onclick = () => txId && copyToClipboard(txId, 'Transaction ID'); const idRow = document.getElementById('confirm-id-row'); if (idLabel && idValue) { document.getElementById('confirm-id-label').textContent = `${idLabel}:`; document.getElementById('confirm-id-value').textContent = idValue; idRow.style.display = 'flex'; } else { idRow.style.display = 'none'; } document.getElementById('confirmation-modal').style.display = 'flex'; }
     
     </script>
 </body>
