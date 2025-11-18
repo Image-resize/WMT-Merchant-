@@ -3,160 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WMT Merchant</title>
+    <title>WMT Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDK Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
-    <!-- QR Code Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.4/html5-qrcode.min.js"></script>
-    
     <style>
-        /* All CSS styles remain the same */
+        :root { --primary: #1a73e8; --secondary: #34a853; --accent: #fbbc05; --danger: #ea4335; --light: #f8f9fa; --dark: #202124; --gray: #5f6368; --bg-color: #f1f3f6; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        :root { --primary: #ea4335; --secondary: #34a853; --accent: #fbbc05; --light: #f8f9fa; --dark: #202124; --gray: #5f6368; }
-        body { background-color: #f5f7fa; color: var(--dark); line-height: 1.6; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-        .auth-container { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #c5372a 0%, #a02d22 100%); padding: 20px; }
-        .auth-card { background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; padding: 30px; }
-        .logo { text-align: center; margin-bottom: 25px; }
-        .logo h1 { color: var(--primary); font-size: 28px; margin-bottom: 5px; }
-        .logo p { color: var(--gray); font-size: 14px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
-        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #dadce0; border-radius: 8px; font-size: 16px; }
-        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(234, 67, 53, 0.2); outline: none; }
-        .btn { display: inline-block; background: var(--primary); color: white; border: none; border-radius: 8px; padding: 12px 20px; font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.3s; text-align: center; width: 100%; position: relative; }
-        .btn:hover { background: #d33223; transform: translateY(-2px); }
-        .btn.loading { color: transparent; cursor: not-allowed; }
-        .btn.loading::after { content: ''; position: absolute; width: 20px; height: 20px; top: 0; left: 0; right: 0; bottom: 0; margin: auto; border: 3px solid transparent; border-top-color: white; border-radius: 50%; animation: btn-loader 1s ease infinite; }
-        @keyframes btn-loader { to { transform: rotate(1turn); } }
-        .btn-secondary { background: var(--secondary); }
-        .btn-secondary:hover { background: #2d9355; }
-        .home-container { display: none; }
-        .header { background: white; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; }
-        .header-content { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; }
-        .menu-toggle { font-size: 24px; color: var(--dark); cursor: pointer; }
-        .app-name { font-size: 20px; font-weight: 700; color: var(--primary); }
-        .profile-header { display: flex; align-items: center; gap: 10px; }
-        .profile-img-small { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-        .sidebar { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background: white; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); z-index: 200; transition: all 0.3s ease; padding: 20px; overflow-y: auto; }
-        .sidebar.active { left: 0; }
-        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 199; display: none; }
-        .sidebar-overlay.active { display: block; }
-        .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
-        .sidebar-close { font-size: 24px; cursor: pointer; }
-        .sidebar-menu { list-style: none; }
-        .sidebar-menu li { margin-bottom: 10px; }
-        .sidebar-menu a { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 8px; color: var(--dark); text-decoration: none; transition: all 0.3s; }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background: #fdecea; color: var(--primary); }
-        .sidebar-menu i { font-size: 20px; width: 24px; text-align: center; }
-        .main-content { padding: 20px 0; }
+        body { background-color: var(--bg-color); color: var(--dark); }
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #0d47a1, #00796b); }
+        .login-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .admin-panel { display: none; flex-direction: row; }
+        .sidebar { width: 250px; background: #ffffff; height: 100vh; position: fixed; box-shadow: 2px 0 10px rgba(0,0,0,0.05); padding-top: 20px; }
+        .sidebar-header { padding: 0 20px 20px; text-align: center; border-bottom: 1px solid #eee; }
+        .sidebar-menu { list-style: none; padding-top: 20px; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 15px; padding: 15px 20px; color: var(--dark); text-decoration: none; font-weight: 500; transition: all 0.3s; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: #e8f0fe; color: var(--primary); border-right: 3px solid var(--primary); }
+        .main-content { margin-left: 250px; padding: 30px; width: calc(100% - 250px); }
         .page { display: none; }
         .page.active { display: block; }
-        .balance-card { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px; margin-bottom: 25px; text-align: center; }
-        .balance-card h3 { color: var(--gray); font-size: 18px; margin-bottom: 10px; }
-        .balance-amount { font-size: 36px; font-weight: 700; }
-        .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .service-card { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px 15px; text-align: center; transition: all 0.3s; cursor: pointer; }
-        .service-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
-        .service-card.disabled { pointer-events: none; opacity: 0.5; } /* ADDED FOR SERVICE CONTROL */
-        .service-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 20px; color: white; }
-        .add-money .service-icon { background: #1a73e8; }
-        .send-money .service-icon { background: var(--secondary); }
-        .money-out .service-icon { background: var(--accent); }
-        .service-card h4 { font-size: 14px; }
-        .transactions-section { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 20px; }
-        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .section-header h3 { font-size: 18px; }
-        .view-all { color: var(--primary); text-decoration: none; font-weight: 500; font-size: 14px; }
-        .transaction-list { list-style: none; }
-        .transaction-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
-        .transaction-item:last-child { border-bottom: none; }
-        .transaction-info { display: flex; align-items: center; gap: 15px; flex-grow: 1; }
-        .transaction-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; flex-shrink: 0; }
-        .transaction-details { display: flex; flex-direction: column; }
-        .transaction-details h4 { font-size: 16px; margin-bottom: 5px; }
-        .transaction-details p { font-size: 14px; color: var(--gray); }
-        .transaction-id-container { font-size: 12px; color: var(--gray); margin-top: 5px; display: flex; align-items: center; gap: 8px; }
-        .copy-icon { cursor: pointer; transition: color 0.2s; }
-        .copy-icon:hover { color: var(--primary); }
-        .transaction-amount { font-weight: 600; text-align: right; }
-        .credit { color: var(--secondary); }
-        .debit { color: var(--primary); }
-        .form-page { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); padding: 25px; margin-bottom: 25px; }
-        .form-page h2 { margin-bottom: 20px; font-size: 22px; }
-        .profile-upload { text-align: center; margin-bottom: 20px; }
-        .profile-image { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); margin: 0 auto 15px; display: block; }
-        .upload-btn { background: var(--light); color: var(--dark); border: 1px dashed var(--gray); padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px; }
-        .upload-btn:hover { background: #fdecea; border-color: var(--primary); }
-        .user-id-display { display: flex; gap: 10px; margin-top: 5px; }
-        .user-id-display input { flex: 1; padding: 10px; border: 1px solid #dadce0; border-radius: 6px; background: #f9f9f9; }
-        .copy-btn { background: var(--primary); color: white; border: none; border-radius: 6px; padding: 0 15px; cursor: pointer; }
-        .fee-display { background-color: #f0f4f8; border-radius: 8px; padding: 10px 15px; margin-top: 15px; font-size: 14px; color: var(--gray); text-align: center; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; display: none; align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 12px; text-align: center; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-width: 90%; width: 400px; }
-        .modal-close { position: absolute; top: 10px; right: 15px; font-size: 28px; color: var(--gray); cursor: pointer; font-weight: bold; }
-        .confirmation-details .info-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
+        .btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 12px 20px; cursor: pointer; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: none; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-close { cursor: pointer; font-size: 24px; }
+        .service-status-container { display: flex; align-items: center; justify-content: space-between; background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 15px; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--secondary); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .stat-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
     </style>
 </head>
 <body>
-    <!-- Login Page -->
-    <div class="auth-container" id="login-page">
-        <div class="auth-card">
-            <div class="logo"><h1>WMT Merchant</h1><p>Your Business, Your Money</p></div>
+    <div class="login-container" id="login-container">
+        <div class="login-card">
+            <h1>Admin Panel Login</h1>
             <form id="login-form">
-                <div class="form-group"><label for="login-email">Email</label><input type="email" class="form-control" id="login-email" placeholder="merchant.email@example.com" required></div>
-                <div class="form-group"><label for="login-password">Password</label><input type="password" class="form-control" id="login-password" placeholder="Enter your password" required></div>
-                <button type="submit" class="btn" id="login-btn">Login</button>
+                <div class="form-group"><input type="email" id="login-email" class="form-control" placeholder="Admin Email" required></div>
+                <div class="form-group"><input type="password" id="login-password" class="form-control" placeholder="Password" required></div>
+                <button type="submit" class="btn">Login</button>
             </form>
         </div>
     </div>
 
-    <!-- Merchant Home Page -->
-    <div class="home-container" id="home-page">
-        <header class="header">
-            <div class="container">
-                <div class="header-content">
-                    <div class="menu-toggle" id="menu-toggle"><i class="fas fa-bars"></i></div>
-                    <div class="app-name">WMT Merchant</div>
-                    <div class="profile-header"><img src="" alt="Profile" class="profile-img-small" id="header-profile-img"></div>
-                </div>
-            </div>
-        </header>
-
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header"><h3>Menu</h3><div class="sidebar-close" id="sidebar-close"><i class="fas fa-times"></i></div></div>
+    <div class="admin-panel" id="admin-panel">
+        <div class="sidebar">
+            <div class="sidebar-header"><h2>WMT Admin</h2></div>
             <ul class="sidebar-menu">
-                <li><a href="#home" class="sidebar-link active" data-page="home"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="#transactions" class="sidebar-link" data-page="transactions"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
-                <li><a href="#profile" class="sidebar-link" data-page="profile"><i class="fas fa-user"></i> My Profile</a></li>
-                <li><a href="#settings" class="sidebar-link" data-page="settings"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="#" class="sidebar-link active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="#" class="sidebar-link" data-page="users"><i class="fas fa-users"></i> All Users</a></li>
+                <li><a href="#" class="sidebar-link" data-page="kyc"><i class="fas fa-user-check"></i> KYC Codes</a></li>
+                <li><a href="#" class="sidebar-link" data-page="redeem"><i class="fas fa-gift"></i> Redeem Codes</a></li>
+                <li><a href="#" class="sidebar-link" data-page="settings"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="#" class="sidebar-link" data-page="maintenance"><i class="fas fa-server"></i> App Maintenance</a></li>
                 <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </div>
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
         <main class="main-content">
-            <div class="container">
-                <div class="page active" id="home-content"><div class="balance-card"><h3>Available Balance</h3><div class="balance-amount">$<span id="home-balance">0.00</span></div></div><div class="services-grid"><div class="service-card add-money" data-service="add-money"><div class="service-icon"><i class="fas fa-plus"></i></div><h4>Add Money</h4></div><div class="service-card send-money" data-service="send-money"><div class="service-icon"><i class="fas fa-paper-plane"></i></div><h4>Send Money</h4></div><div class="service-card money-out" data-service="money-out"><div class="service-icon"><i class="fas fa-money-bill-wave"></i></div><h4>Money Out</h4></div></div><div class="transactions-section"><div class="section-header"><h3>Recent Transactions</h3><a href="#transactions" class="view-all" id="view-all-transactions">View All</a></div><ul class="transaction-list" id="recent-transactions"></ul></div></div>
-                <div class="page" id="transactions-content"><div class="form-page"><h2>All Transactions</h2><div class="transactions-section"><ul class="transaction-list" id="all-transactions"></ul></div></div></div>
-                <div class="page" id="profile-content"><div class="form-page"><h2>My Profile</h2><div class="profile-upload"><img src="" alt="Profile" class="profile-image" id="profile-image-view"><input type="file" id="profile-image-upload" accept="image/*" style="display: none;"><button type="button" class="upload-btn" id="upload-image-btn">Change Profile Image</button></div><button class="btn btn-secondary" id="show-qr-btn" style="margin-bottom: 20px;"><i class="fas fa-qrcode"></i> Show My Payment QR Code</button><div class="form-group"><label>Business Name</label><div class="form-control" style="background: #f9f9f9;" id="profile-name"></div></div><div class="form-group"><label>Merchant ID (PWMT)</label><div class="user-id-display"><input type="text" class="form-control" id="profile-user-id" readonly><button class="copy-btn" onclick="copyToClipboard(document.getElementById('profile-user-id').value, 'Merchant ID')">Copy</button></div></div><div class="form-group"><label>Email</label><div class="form-control" style="background: #f9f9f9;" id="profile-email"></div></div></div></div>
-                <div class="page" id="settings-content"><div class="form-page"><h2>Settings</h2><h3>Change Password</h3><div class="form-group"><label for="current-password">Current Password</label><input type="password" class="form-control" id="current-password"></div><div class="form-group"><label for="new-password">New Password (min. 6 characters)</label><input type="password" class="form-control" id="new-password"></div><button class="btn" id="change-password-btn">Change Password</button></div></div>
-                <div class="page" id="add-money-content"><div class="form-page"><h2>Add Money</h2><div class="form-group"><label for="redeem-code">Redeem Code</label><input type="text" class="form-control" id="redeem-code" placeholder="Enter redeem code from admin"></div><div class="form-group"><label for="redeem-password">Code Password</label><input type="password" class="form-control" id="redeem-password" placeholder="Enter password for the code"></div><button class="btn" id="redeem-btn">Redeem Code</button></div></div>
-                <div class="page" id="send-money-content"><div class="form-page"><h2>Send Money</h2><form id="send-money-form"><div class="form-group"><label for="recipient-id">Recipient User ID (WMT/PWMT)</label><div style="display: flex; gap: 10px;"><input type="text" class="form-control" id="recipient-id" required><button type="button" class="btn" id="scan-qr-send" style="width: auto;"><i class="fas fa-qrcode"></i></button></div></div><div class="form-group"><label for="send-amount">Amount ($)</label><input type="number" step="0.01" class="form-control" id="send-amount" required></div><div class="fee-display" id="send-fee-display" style="display: none;"></div><div class="form-group" style="margin-top: 20px;"><label for="send-password">Your Password</label><input type="password" class="form-control" id="send-password" required></div><button type="submit" class="btn" id="send-money-btn">Send Money</button></form></div></div>
-                <div class="page" id="money-out-content"><div class="form-page"><h2>Money Out</h2><form id="money-out-form"><div class="form-group"><label for="agent-id">Agent User ID (AWMT ID)</label><div style="display: flex; gap: 10px;"><input type="text" class="form-control" id="agent-id" required><button type="button" class="btn" id="scan-qr-out" style="width: auto;"><i class="fas fa-qrcode"></i></button></div></div><div class="form-group"><label for="money-out-amount">Amount ($)</label><input type="number" step="0.01" class="form-control" id="money-out-amount" required></div><div class="fee-display" id="money-out-fee-display" style="display: none;"></div><div class="form-group" style="margin-top: 20px;"><label for="money-out-password">Your Password</label><input type="password" class="form-control" id="money-out-password" required></div><button type="submit" class="btn" id="money-out-btn">Money Out</button></form></div></div>
+            <div class="page active" id="dashboard-content">
+                 <div class="dashboard-grid">
+                    <div class="stat-card"><h3>Total Users</h3><p id="total-users">0</p></div>
+                    <div class="stat-card"><h3>Total Merchants</h3><p id="total-merchants">0</p></div>
+                    <div class="stat-card"><h3>Total Agents</h3><p id="total-agents">0</p></div>
+                    <div class="stat-card"><h3>KYC Verified</h3><p id="kyc-verified-users">0</p></div>
+                    <div class="stat-card"><h3>Total Balance</h3><p id="total-user-balance">$0.00</p></div>
+                    <div class="stat-card"><h3>Total Charges</h3><p id="total-service-charge">$0.00</p></div>
+                </div>
+            </div>
+            <div class="page" id="users-content">
+                <div class="card">
+                    <input type="text" id="user-search" class="form-control" placeholder="Search by name, email, or ID...">
+                    <table id="users-table"><thead><tr><th>Name</th><th>User ID</th><th>Type</th><th>Email</th><th>Balance</th><th>KYC</th><th>Actions</th></tr></thead><tbody></tbody></table>
+                </div>
+            </div>
+            <div class="page" id="kyc-content"><div class="card"><button id="generate-kyc-code-btn" class="btn">Generate KYC Code</button><table id="kyc-codes-table"><thead><tr><th>Code</th><th>Created</th><th>Action</th></tr></thead><tbody></tbody></table></div></div>
+            <div class="page" id="redeem-content"><div class="card"><form id="redeem-code-form"><input type="number" id="redeem-amount" placeholder="Amount" class="form-control" style="margin-bottom:10px;"><input type="text" id="redeem-password" placeholder="Password" class="form-control" style="margin-bottom:10px;"><input type="date" id="redeem-expiry" class="form-control" style="margin-bottom:10px;"><button type="submit" class="btn">Generate</button></form><table id="redeem-codes-table"><thead><tr><th>Code</th><th>Amount</th><th>Password</th><th>Expiry</th><th>Used</th><th>Action</th></tr></thead><tbody></tbody></table></div></div>
+            
+            <div class="page" id="settings-content">
+                <div class="card">
+                    <h2>Service Charges</h2>
+                    <form id="fees-form">
+                        <div class="form-group"><label>User - Send Money Fee ($)</label><input type="number" step="0.01" id="user-send-money-fee" class="form-control"></div>
+                        <div class="form-group"><label>User - Money Out Fee (%)</label><input type="number" step="0.01" id="user-money-out-fee" class="form-control"></div>
+                        <hr style="margin:20px 0;">
+                        <div class="form-group"><label>Merchant - Send Money Fee ($)</label><input type="number" step="0.01" id="merchant-send-money-fee" class="form-control"></div>
+                        <div class="form-group"><label>Merchant - Money Out Fee (%)</label><input type="number" step="0.01" id="merchant-money-out-fee" class="form-control"></div>
+                        <button type="submit" class="btn">Save Charges</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="page" id="maintenance-content">
+                <div class="card">
+                    <h2>App Maintenance Mode</h2>
+                    <p style="margin-bottom: 20px; color: var(--gray);">When enabled, all user, merchant, and agent apps will be temporarily disabled and show a maintenance screen.</p>
+                    <div class="service-status-container">
+                        <div>
+                            <h4>Activate Maintenance Mode</h4>
+                            <p>This will take all apps offline.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="maintenance-mode-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
 
-    <!-- Modals -->
-    <div class="modal-overlay" id="qr-modal"><div class="modal-content"><span class="modal-close" onclick="closeModal('qr-modal')">&times;</span><h3>Scan to Receive Payment</h3><div id="modal-qrcode-container"></div><p style="margin-top: 10px; color: var(--gray);">My Merchant ID: <strong id="modal-user-id"></strong></p></div></div>
-    <div class="modal-overlay" id="qr-scanner-modal"><div class="modal-content"><span class="modal-close" onclick="closeModal('qr-scanner-modal')">&times;</span><h3>Scan QR Code</h3><div id="qr-reader" style="width: 100%;"></div></div></div>
-    <div class="modal-overlay" id="confirmation-modal"><div class="modal-content" style="max-width: 450px; text-align: left;"><div style="text-align: center; color: var(--secondary); margin-bottom: 20px;"><i class="fas fa-check-circle" style="font-size: 60px;"></i><h3 style="margin-top: 15px; font-size: 22px;">Transaction Successful</h3></div><div class="confirmation-details"><div class="info-row"><span>Amount:</span><strong id="confirm-amount"></strong></div><div class="info-row"><span>Service Fee:</span><strong id="confirm-fee"></strong></div><div class="info-row"><span>Total Deducted:</span><strong id="confirm-total"></strong></div><hr style="margin: 12px 0; border-top: 1px solid #eee;"><div class="info-row"><span>Remaining Balance:</span><strong id="confirm-balance"></strong></div><div class="info-row"><span>Date & Time:</span><strong id="confirm-datetime"></strong></div><div class="info-row" id="confirm-id-row" style="display: none;"><span id="confirm-id-label"></span><strong id="confirm-id-value" class="mono-font"></strong></div><div class="info-row" style="align-items: center;"><span>Transaction ID:</span><div style="display: flex; align-items: center; gap: 8px;"><strong id="confirm-tx-id" class="mono-font" style="font-size: 12px;"></strong><i class="fas fa-copy" id="confirm-copy-btn" style="cursor: pointer; color: var(--primary);"></i></div></div></div><button class="btn" id="confirmation-close-btn" style="margin-top: 25px;">Done</button></div></div>
+    <div class="modal" id="edit-user-modal"><div class="modal-content"><div class="modal-header"><h3>Edit User</h3><span class="modal-close" onclick="closeModal('edit-user-modal')">&times;</span></div><form id="edit-user-form"><input type="hidden" id="edit-user-uid"><div class="form-group"><label>Name</label><input type="text" id="edit-full-name" class="form-control"></div><div class="form-group"><label>Email</label><input type="email" id="edit-email" class="form-control" readonly></div><div class="form-group"><label>DOB</label><input type="date" id="edit-dob" class="form-control"></div><div class="form-group"><label>Gender</label><select id="edit-gender" class="form-control"><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div><button type="submit" class="btn">Save</button></form></div></div>
+    <div class="modal" id="edit-balance-modal"><div class="modal-content"><div class="modal-header"><h3>Edit Balance</h3><span class="modal-close" onclick="closeModal('edit-balance-modal')">&times;</span></div><form id="edit-balance-form"><input type="hidden" id="edit-balance-user-uid"><div class="form-group"><label>New Balance</label><input type="number" step="0.01" id="new-balance" class="form-control"></div><button type="submit" class="btn">Update</button></form></div></div>
+    <div class="modal" id="transactions-modal"><div class="modal-content"><div class="modal-header"><h3 id="transactions-modal-title">History</h3><span class="modal-close" onclick="closeModal('transactions-modal')">&times;</span></div><table id="user-transactions-table" style="max-height: 60vh; overflow-y: auto; display: block;"><thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Desc</th><th>ID</th></tr></thead><tbody id="user-transactions-tbody"></tbody></table></div></div>
 
     <script>
     const firebaseConfig = {
@@ -166,391 +135,199 @@
       projectId: "wmt-services",
       storageBucket: "wmt-services.firebasestorage.app",
       messagingSenderId: "935651931226",
-      appId: "1:935651931226:web:5c412bd299f215c14f5463",
+      appId: "1:935651931226:web:5c412bd299f215c14f5463"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let currentUser = null; 
-    let html5QrCodeScanner = null;
-    let activeQrInputId = null;
-    let configFees = { sendMoneyFixedFee: 0.08, moneyOutPercentageFee: 0.0008 };
-    let areServicesEnabled = true; // ADDED: Global variable for service status
-    const allMainPages = ['login-page', 'home-page'];
-    const pages = document.querySelectorAll('.page');
-    
-    function showMainContainer(pageId) {
-        allMainPages.forEach(p => { 
-            const el = document.getElementById(p);
-            if (el) el.style.display = (p === pageId) ? 'flex' : 'none';
-        });
-        if (pageId === 'home-page') document.getElementById(pageId).style.display = 'block';
-    }
+    let allUsersCache = [];
 
-    function toggleButtonLoading(btn, isLoading) {
-        btn.classList.toggle('loading', isLoading);
-        btn.disabled = isLoading;
-    }
-
-    // All event listeners are set up as soon as the page loads.
-    document.addEventListener('DOMContentLoaded', () => {
-        setupEventListeners();
-        initializeAuthHandler();
+    auth.onAuthStateChanged(async user => {
+        const loginUI = document.getElementById('login-container');
+        const panelUI = document.getElementById('admin-panel');
+        if (user) {
+            const isAdmin = await checkAdminStatus(user);
+            loginUI.style.display = 'none';
+            panelUI.style.display = isAdmin ? 'flex' : 'none';
+            if (isAdmin) {
+                initializeAdminPanel();
+            } else {
+                alert("You are not authorized.");
+                auth.signOut();
+            }
+        } else {
+            loginUI.style.display = 'flex';
+            panelUI.style.display = 'none';
+        }
     });
 
-    function initializeAuthHandler() {
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                db.collection('users').where("email", "==", user.email).limit(1).onSnapshot(snapshot => {
-                    if (!snapshot.empty) {
-                        const userDoc = snapshot.docs[0];
-                        const userData = userDoc.data();
-                        if (userData.userType !== 'merchant') {
-                            alert("Access Denied. This login portal is for merchants only.");
-                            auth.signOut(); return;
-                        }
-                        currentUser = { uid: userDoc.id, auth_uid: user.uid, ...userData };
-                        if (document.getElementById('home-page').style.display !== 'block') {
-                            initializeAppUI();
-                        } else {
-                            updateAllUI();
-                        }
-                    } else {
-                        console.error("User data not found in Firestore for email:", user.email);
-                        auth.signOut();
-                    }
-                }, error => {
-                    console.error("Error fetching user data:", error);
-                    auth.signOut();
-                });
-            } else {
-                currentUser = null;
-                showMainContainer('login-page');
-                if (document.getElementById('login-form')) document.getElementById('login-form').reset();
-            }
-        });
+    async function checkAdminStatus(user) {
+        try {
+            const adminDoc = await db.collection('admins').doc('admin_uids').get();
+            return adminDoc.exists && adminDoc.data().uids.includes(user.uid);
+        } catch (e) { 
+            console.error("Admin check failed:", e);
+            return false; 
+        }
     }
 
-    // --- MODIFIED: More specific and robust fee handling ---
-    function listenForFeeUpdates() {
-        db.collection('settings').doc('fees').onSnapshot((doc) => {
-            if (doc.exists) {
-                const allFees = doc.data();
-                // Specifically get merchant fees
-                if (allFees.merchant) {
-                    if (typeof allFees.merchant.sendMoneyFixedFee === 'number') {
-                        configFees.sendMoneyFixedFee = allFees.merchant.sendMoneyFixedFee;
-                    }
-                    if (typeof allFees.merchant.moneyOutPercentageFee === 'number') {
-                        configFees.moneyOutPercentageFee = allFees.merchant.moneyOutPercentageFee;
-                    }
-                }
-            }
-        });
+    function initializeAdminPanel() {
+        setupEventListeners();
+        loadDashboardData();
+        loadAllUsers();
+        loadKycCodes();
+        loadRedeemCodes();
+        loadSettings();
     }
 
-    // --- ADDED: New function to listen for service status changes ---
-    function listenForServiceStatusUpdates() {
-        db.collection('settings').doc('status').onSnapshot((doc) => {
-            if (doc.exists) {
-                const status = doc.data();
-                // Check for 'merchantServicesEnabled'. Default to true if not set.
-                areServicesEnabled = status.merchantServicesEnabled !== false;
-                
-                // Enable or disable service buttons and cards based on the status
-                const serviceCards = document.querySelectorAll('.service-card');
-                const actionButtons = [
-                    document.getElementById('redeem-btn'),
-                    document.getElementById('send-money-btn'),
-                    document.getElementById('money-out-btn')
-                ];
-
-                if (areServicesEnabled) {
-                    serviceCards.forEach(card => card.classList.remove('disabled'));
-                    actionButtons.forEach(btn => { if(btn) btn.disabled = false; });
-                } else {
-                    serviceCards.forEach(card => card.classList.add('disabled'));
-                    actionButtons.forEach(btn => { if(btn) btn.disabled = true; });
-                    alert("Services are temporarily disabled by the admin.");
-                }
-            } else {
-                // If the status document doesn't exist, assume services are enabled.
-                areServicesEnabled = true;
-            }
-        });
-    }
-    
-    function initializeAppUI() {
-        showMainContainer('home-page');
-        listenForFeeUpdates(); // MODIFIED
-        listenForServiceStatusUpdates(); // ADDED
-        handleHashChange();
-        updateAllUI();
-    }
-
-    function updateAllUI() {
-        if (!currentUser) return;
-        const balance = (currentUser.balance || 0).toFixed(2);
-        document.getElementById('home-balance').textContent = balance;
-        ['header-profile-img', 'profile-image-view'].forEach(id => document.getElementById(id).src = currentUser.profileImg);
-        document.getElementById('profile-name').textContent = currentUser.name;
-        document.getElementById('profile-email').textContent = currentUser.email;
-        document.getElementById('profile-user-id').value = currentUser.userId;
-        loadTransactions();
-    }
-    
     function setupEventListeners() {
-        document.getElementById('login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('login-btn');
-            toggleButtonLoading(btn, true);
-            auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value)
-                .catch(err => alert('Login failed: ' + err.message))
-                .finally(() => toggleButtonLoading(btn, false));
-        });
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.hash = '';
-                window.location.reload();
-            });
-        });
-        const closeSidebar = () => {
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('sidebar-overlay').classList.remove('active');
-        };
-        document.getElementById('menu-toggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.add('active');
-            document.getElementById('sidebar-overlay').classList.add('active');
-        });
-        ['sidebar-close', 'sidebar-overlay'].forEach(id => document.getElementById(id).addEventListener('click', closeSidebar));
-        
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                closeSidebar();
-            });
-        });
-
-        document.querySelectorAll('.service-card').forEach(card => {
-            card.addEventListener('click', () => {
-                // ADDED: Check service status before navigating
-                if (!areServicesEnabled) {
-                    alert("Services are currently disabled by the admin.");
-                    return;
-                }
-                window.location.hash = card.dataset.service;
-            });
-        });
-        
-        document.getElementById('view-all-transactions').addEventListener('click', (e) => {
-             e.preventDefault();
-             window.location.hash = 'transactions';
-        });
-
-        window.addEventListener('hashchange', handleHashChange);
-        
-        document.getElementById('redeem-btn').addEventListener('click', handleRedeem);
-        document.getElementById('send-money-form').addEventListener('submit', handleSendMoney);
-        document.getElementById('money-out-form').addEventListener('submit', handleMoneyOut);
-        document.getElementById('change-password-btn').addEventListener('click', handleChangePassword);
-        document.getElementById('upload-image-btn').addEventListener('click', () => document.getElementById('profile-image-upload').click());
-        document.getElementById('profile-image-upload').addEventListener('change', (e) => { if (e.target.files[0]) handleImageUpload(e.target.files[0]); });
-        document.getElementById('show-qr-btn').addEventListener('click', () => { generateQRCode(currentUser.userId); document.getElementById('modal-user-id').textContent = currentUser.userId; document.getElementById('qr-modal').style.display = 'flex'; });
-        document.getElementById('scan-qr-send').addEventListener('click', () => startQrScanner('recipient-id'));
-        document.getElementById('scan-qr-out').addEventListener('click', () => startQrScanner('agent-id'));
-        document.getElementById('send-amount').addEventListener('input', e => { const amount = parseFloat(e.target.value) || 0, fee = configFees.sendMoneyFixedFee; document.getElementById('send-fee-display').textContent = `Fee: $${fee.toFixed(2)}. Total: $${(amount + fee).toFixed(2)}`; document.getElementById('send-fee-display').style.display = amount > 0 ? 'block' : 'none'; });
-        document.getElementById('money-out-amount').addEventListener('input', e => { const amount = parseFloat(e.target.value) || 0, fee = amount * configFees.moneyOutPercentageFee, feePercent = (configFees.moneyOutPercentageFee * 100).toFixed(2); document.getElementById('money-out-fee-display').textContent = `Fee (${feePercent}%): $${fee.toFixed(2)}. Total: $${(amount + fee).toFixed(2)}`; document.getElementById('money-out-fee-display').style.display = amount > 0 ? 'block' : 'none'; });
-        document.getElementById('confirmation-close-btn').addEventListener('click', () => closeModal('confirmation-modal'));
-    }
-    
-    function handleHashChange() {
-        const pageId = window.location.hash.substring(1) || 'home';
-        showPage(pageId);
+        document.getElementById('login-form').addEventListener('submit', e => { e.preventDefault(); auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value).catch(err => alert(err.message)); });
+        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+        document.querySelectorAll('.sidebar-link').forEach(link => { if(link.id !== 'logout-btn') { link.addEventListener('click', e => { e.preventDefault(); showPage(link.dataset.page); }); }});
+        document.getElementById('user-search').addEventListener('input', e => { const term = e.target.value.toLowerCase(); renderUsersTable(allUsersCache.filter(u => u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term) || u.userId.toLowerCase().includes(term))); });
+        document.getElementById('edit-user-form').addEventListener('submit', handleEditUser);
+        document.getElementById('edit-balance-form').addEventListener('submit', handleEditBalance);
+        document.getElementById('generate-kyc-code-btn').addEventListener('click', handleGenerateKyc);
+        document.getElementById('redeem-code-form').addEventListener('submit', handleGenerateRedeem);
+        document.getElementById('fees-form').addEventListener('submit', handleSaveFees);
+        document.getElementById('maintenance-mode-toggle').addEventListener('change', e => updateMaintenanceStatus(e.target.checked));
     }
 
     function showPage(pageId) {
-        if (!document.getElementById(`${pageId}-content`)) {
-            console.warn(`Page content for '${pageId}' not found. Defaulting to home.`);
-            window.location.hash = 'home';
-            return;
-        }
-        pages.forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(`${pageId}-content`).classList.add('active');
-        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.dataset.page === pageId));
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+        document.querySelector(`.sidebar-link[data-page="${pageId}"]`).classList.add('active');
     }
 
-    async function addTransaction(docId, type, amount, description, icon, existingTxId = null) {
-        if (!docId) return null;
-        const transactionData = { type, amount, description, icon, date: firebase.firestore.Timestamp.now() };
-        try {
-            const collectionRef = db.collection('users').doc(docId).collection('transactions');
-            let docRef;
-            if (existingTxId) {
-                docRef = collectionRef.doc(existingTxId);
-                await docRef.set(transactionData);
-            } else {
-                docRef = await collectionRef.add(transactionData);
-            }
-            await docRef.update({ transactionId: docRef.id });
-            return docRef.id;
-        } catch (error) {
-            console.error(`Error creating transaction for user ${docId}:`, error);
-            return null;
-        }
-    }
-
-    function loadTransactions() { 
-        if (!currentUser) return;
-        db.collection('users').doc(currentUser.uid).collection('transactions').orderBy('date', 'desc').limit(20)
-          .onSnapshot(querySnapshot => {
-            const recentList = document.getElementById('recent-transactions');
-            const allList = document.getElementById('all-transactions');
-            recentList.innerHTML = ''; allList.innerHTML = '';
-            if (querySnapshot.empty) {
-                const noTxMsg = "<li><p style='text-align:center; color: var(--gray);'>No transactions yet.</p></li>";
-                recentList.innerHTML = noTxMsg; allList.innerHTML = noTxMsg; return;
-            }
-            querySnapshot.docs.forEach((doc, index) => {
-                const txElement = createTransactionElement(doc.data());
-                allList.appendChild(txElement.cloneNode(true));
-                if (index < 5) recentList.appendChild(txElement);
-            });
-        }, error => console.error("Error loading transactions:", error));
-    }
-
-    function createTransactionElement(tx) {
-        const li = document.createElement('li'); li.className = 'transaction-item';
-        const isCredit = tx.type === 'credit';
-        const txId = tx.transactionId || 'N/A';
-        const shortTxId = txId.length > 8 ? txId.substring(0, 8) + '...' : txId;
-        li.innerHTML = `<div class="transaction-info"><div class="transaction-icon" style="background-color: ${isCredit ? 'var(--secondary)' : 'var(--primary)'};"><i class="fas ${tx.icon}"></i></div><div class="transaction-details"><h4>${tx.description}</h4><p>${tx.date.toDate().toLocaleString()}</p><div class="transaction-id-container"><span>ID: ${shortTxId}</span><i class="fas fa-copy copy-icon" onclick="copyToClipboard('${txId}', 'Transaction ID')"></i></div></div></div><div class="transaction-amount ${tx.type}">${isCredit ? '+' : '-'}$${tx.amount.toFixed(2)}</div>`;
-        return li;
-    }
-    
-    async function handleTransaction(form, button, passwordInput, action) {
-        // ADDED: Check service status before any transaction
-        if (!areServicesEnabled) {
-            alert("This action cannot be completed because services are temporarily disabled by the admin.");
-            return;
-        }
-        toggleButtonLoading(button, true);
-        try {
-            const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, passwordInput.value);
-            await auth.currentUser.reauthenticateWithCredential(credential);
-            await action();
-            if (form) form.reset();
-        } catch (error) {
-            alert(`Error: ${error.message}`);
-        } finally {
-            if (passwordInput) passwordInput.value = '';
-            toggleButtonLoading(button, false);
-        }
-    }
-    
-    function handleRedeem(e) {
-        const btn = e.target, form = btn.closest('.form-page');
-        const code = document.getElementById('redeem-code').value.trim().toUpperCase(), password = document.getElementById('redeem-password').value;
-        if (!code || !password) return alert('Please fill all fields.');
-        handleTransaction(form, btn, {value: password}, async () => { 
-            const q = await db.collection('redeem_codes').where('code', '==', code).where('password', '==', password).limit(1).get();
-            if (q.empty) throw new Error('Invalid code or password.');
-            const doc = q.docs[0]; if (doc.data().isUsed) throw new Error('Code already used.');
-            const amount = doc.data().amount;
-            await db.runTransaction(async t => {
-                t.update(db.collection('users').doc(currentUser.uid), { balance: firebase.firestore.FieldValue.increment(amount) });
-                t.update(doc.ref, { isUsed: true, usedBy: currentUser.uid, usedAt: firebase.firestore.Timestamp.now() });
-            });
-            const txId = await addTransaction(currentUser.uid, 'credit', amount, `Redeemed Code`, 'fa-plus-circle');
-            showConfirmationPopup({ amount, fee: 0, txId, finalBalance: currentUser.balance + amount, idLabel: "Redeem Code", idValue: code });
+    async function loadDashboardData() {
+        const usersSnapshot = await db.collection('users').get();
+        let counts = { users: 0, merchants: 0, agents: 0, kyc: 0 };
+        let totalBalance = 0, totalCharges = 0;
+        const promises = usersSnapshot.docs.map(async doc => {
+            const user = doc.data();
+            if (user.userType === 'merchant') counts.merchants++; else if (user.userType === 'agent') counts.agents++; else counts.users++;
+            if (user.isKycVerified) counts.kyc++;
+            totalBalance += user.balance || 0;
+            const txSnapshot = await db.collection('users').doc(doc.id).collection('transactions').get();
+            txSnapshot.forEach(txDoc => { if (txDoc.data().description?.endsWith('Fee')) totalCharges += txDoc.data().amount || 0; });
         });
+        await Promise.all(promises);
+        document.getElementById('total-users').textContent = counts.users;
+        document.getElementById('total-merchants').textContent = counts.merchants;
+        document.getElementById('total-agents').textContent = counts.agents;
+        document.getElementById('kyc-verified-users').textContent = counts.kyc;
+        document.getElementById('total-user-balance').textContent = `$${totalBalance.toFixed(2)}`;
+        document.getElementById('total-service-charge').textContent = `$${totalCharges.toFixed(2)}`;
     }
 
-    function handleSendMoney(e) { 
-        e.preventDefault(); const form = e.target;
-        const recipientId = document.getElementById('recipient-id').value.trim();
-        const amount = parseFloat(document.getElementById('send-amount').value);
-
-        if (recipientId.toUpperCase().startsWith("AWMT")) {
-            alert("Agents (AWMT) cannot be sent money directly. Please use the 'Money Out' service for transactions with agents.");
-            return; 
-        }
-
-        const fee = configFees.sendMoneyFixedFee, total = amount + fee;
-        if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
-        if (total > currentUser.balance) return alert('Insufficient balance.');
-        
-        handleTransaction(form, form.querySelector('button'), document.getElementById('send-password'), async () => {
-            const q = await db.collection('users').where('userId', '==', recipientId).limit(1).get();
-            if (q.empty) throw new Error('Recipient not found.');
-            const recipientDoc = q.docs[0];
-            const senderTxId = await addTransaction(currentUser.uid, 'debit', amount, `Sent to ${recipientDoc.data().name}`, 'fa-paper-plane');
-            if (senderTxId) {
-                await addTransaction(recipientDoc.id, 'credit', amount, `Received from ${currentUser.name}`, 'fa-wallet', senderTxId);
-                await db.runTransaction(async t => {
-                    t.update(db.collection('users').doc(currentUser.uid), { balance: firebase.firestore.FieldValue.increment(-total) });
-                    t.update(db.collection('users').doc(recipientDoc.id), { balance: firebase.firestore.FieldValue.increment(amount) });
-                });
-                showConfirmationPopup({ amount, fee, txId: senderTxId, finalBalance: currentUser.balance - total, idLabel: "Recipient ID", idValue: recipientDoc.data().userId });
-            }
-        });
+    async function loadAllUsers() {
+        const snapshot = await db.collection('users').orderBy('name').get();
+        allUsersCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderUsersTable(allUsersCache);
     }
 
-    function handleMoneyOut(e) { 
-        e.preventDefault(); const form = e.target;
-        const agentId = document.getElementById('agent-id').value.trim(), amount = parseFloat(document.getElementById('money-out-amount').value);
-        if (!agentId.toUpperCase().startsWith("AWMT")) return alert('Invalid Agent ID. It must start with AWMT.');
-        const fee = amount * configFees.moneyOutPercentageFee, total = amount + fee;
-        if (isNaN(amount) || amount <= 0) return alert("Please enter a valid amount.");
-        if (total > currentUser.balance) return alert('Insufficient balance.');
-        handleTransaction(form, form.querySelector('button'), document.getElementById('money-out-password'), async () => {
-            const q = await db.collection('users').where('userId', '==', agentId).limit(1).get();
-            if (q.empty) throw new Error('Agent not found.');
-            const agentDoc = q.docs[0];
-            const senderTxId = await addTransaction(currentUser.uid, 'debit', amount, `Money Out to ${agentDoc.data().name}`, 'fa-money-bill-wave');
-            if(senderTxId){
-                await addTransaction(agentDoc.id, 'credit', amount, `Received from ${currentUser.name}`, 'fa-wallet', senderTxId);
-                await db.runTransaction(async t => {
-                    t.update(db.collection('users').doc(currentUser.uid), { balance: firebase.firestore.FieldValue.increment(-total) });
-                    t.update(db.collection('users').doc(agentDoc.id), { balance: firebase.firestore.FieldValue.increment(amount) });
-                });
-                showConfirmationPopup({ amount, fee, txId: senderTxId, finalBalance: currentUser.balance - total, idLabel: "Agent ID", idValue: agentDoc.data().userId });
-            }
-        });
-    }
-
-    function handleChangePassword(e) {
-        const currentPass = document.getElementById('current-password').value, newPass = document.getElementById('new-password').value;
-        if (newPass.length < 6) return alert("New password must be at least 6 characters.");
-        handleTransaction(null, e.target, {value: currentPass}, async () => {
-            await auth.currentUser.updatePassword(newPass);
-            alert("Password changed successfully!");
-            document.getElementById('current-password').value = ''; document.getElementById('new-password').value = '';
+    function renderUsersTable(users) {
+        const tbody = document.querySelector('#users-table tbody');
+        tbody.innerHTML = '';
+        users.forEach(user => {
+            const userJson = JSON.stringify(user).replace(/'/g, "&apos;");
+            tbody.innerHTML += `<tr>
+                <td>${user.name}</td><td>${user.userId}</td><td>${user.userType || 'user'}</td><td>${user.email}</td>
+                <td>$${(user.balance || 0).toFixed(2)}</td><td>${user.isKycVerified ? 'Verified' : 'Not Verified'}</td>
+                <td>
+                    <button class="btn" style="font-size:12px; padding:5px 8px;" onclick="openTransactionsModal('${user.id}', '${user.name.replace(/'/g, "\\'")}')">History</button>
+                    <button class="btn" style="font-size:12px; padding:5px 8px;" onclick="openEditBalanceModal('${user.id}', ${user.balance || 0})">Balance</button>
+                    <button class="btn" style="font-size:12px; padding:5px 8px;" onclick='openEditUserModal(${userJson})'>Edit</button>
+                </td></tr>`;
         });
     }
     
-    async function handleImageUpload(file) {
-        const cloudName = 'dntvrm1wn', uploadPreset = 'ml_default', url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-        const formData = new FormData(); formData.append('file', file); formData.append('upload_preset', uploadPreset);
-        const previewEl = document.getElementById('profile-image-view'), originalSrc = previewEl.src;
-        previewEl.src = "https://i.gifer.com/ZZ5H.gif";
-        try {
-            const res = await fetch(url, { method: 'POST', body: formData });
-            const data = await res.json();
-            if (data.secure_url) {
-                await db.collection('users').doc(currentUser.uid).update({ profileImg: data.secure_url });
-                alert("Profile image updated!");
-            } else { throw new Error('Upload failed'); }
-        } catch (error) { alert('Error uploading image.'); previewEl.src = originalSrc; }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    window.onclick = e => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; };
+
+    function openEditUserModal(user) {
+        document.getElementById('edit-user-uid').value = user.id;
+        document.getElementById('edit-full-name').value = user.name;
+        document.getElementById('edit-email').value = user.email;
+        document.getElementById('edit-dob').value = user.dob;
+        document.getElementById('edit-gender').value = user.gender;
+        openModal('edit-user-modal');
     }
-    
-    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-    function copyToClipboard(text, entity) { navigator.clipboard.writeText(text).then(() => alert(`${entity} copied!`)); }
-    function generateQRCode(text) { const qrContainer = document.getElementById('modal-qrcode-container'); qrContainer.innerHTML = ''; const qr = qrcode(0, 'L'); qr.addData(text); qr.make(); qrContainer.innerHTML = qr.createImgTag(6, 10); }
-    function startQrScanner(inputId) { activeQrInputId = inputId; document.getElementById('qr-scanner-modal').style.display = 'flex'; html5QrCodeScanner = new Html5Qrcode("qr-reader"); html5QrCodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, (decodedText) => { document.getElementById(activeQrInputId).value = decodedText; stopQrScanner(); }).catch(err => alert("Could not start QR scanner.")); }
-    function stopQrScanner() { if (html5QrCodeScanner?.isScanning) html5QrCodeScanner.stop(); closeModal('qr-scanner-modal'); }
-    
-    function showConfirmationPopup(details) { const { amount = 0, fee = 0, txId, finalBalance, idLabel, idValue } = details; document.getElementById('confirm-amount').textContent = `$${amount.toFixed(2)}`; document.getElementById('confirm-fee').textContent = `$${fee.toFixed(2)}`; document.getElementById('confirm-total').textContent = `$${(amount + fee).toFixed(2)}`; document.getElementById('confirm-balance').textContent = `$${finalBalance.toFixed(2)}`; document.getElementById('confirm-datetime').textContent = new Date().toLocaleString(); document.getElementById('confirm-tx-id').textContent = txId ? txId.substring(0, 10) + '...' : 'N/A'; document.getElementById('confirm-copy-btn').onclick = () => txId && copyToClipboard(txId, 'Transaction ID'); const idRow = document.getElementById('confirm-id-row'); if (idLabel && idValue) { document.getElementById('confirm-id-label').textContent = `${idLabel}:`; document.getElementById('confirm-id-value').textContent = idValue; idRow.style.display = 'flex'; } else { idRow.style.display = 'none'; } document.getElementById('confirmation-modal').style.display = 'flex'; }
+
+    async function handleEditUser(e) {
+        e.preventDefault();
+        const uid = document.getElementById('edit-user-uid').value;
+        const data = {
+            name: document.getElementById('edit-full-name').value,
+            dob: document.getElementById('edit-dob').value,
+            gender: document.getElementById('edit-gender').value,
+        };
+        await db.collection('users').doc(uid).update(data);
+        alert('Profile Updated');
+        closeModal('edit-user-modal');
+        loadAllUsers();
+    }
+
+    function openEditBalanceModal(uid, balance) {
+        document.getElementById('edit-balance-user-uid').value = uid;
+        document.getElementById('new-balance').value = balance.toFixed(2);
+        openModal('edit-balance-modal');
+    }
+
+    async function handleEditBalance(e) {
+        e.preventDefault();
+        const uid = document.getElementById('edit-balance-user-uid').value;
+        const balance = parseFloat(document.getElementById('new-balance').value);
+        await db.collection('users').doc(uid).update({ balance });
+        alert('Balance Updated');
+        closeModal('edit-balance-modal');
+        loadAllUsers();
+    }
+
+    async function openTransactionsModal(uid, name) {
+        document.getElementById('transactions-modal-title').textContent = `History for ${name}`;
+        const tbody = document.getElementById('user-transactions-tbody');
+        tbody.innerHTML = `<tr><td colspan="5">Loading...</td></tr>`;
+        openModal('transactions-modal');
+        const snapshot = await db.collection('users').doc(uid).collection('transactions').orderBy('date', 'desc').limit(50).get();
+        tbody.innerHTML = snapshot.empty ? `<tr><td colspan="5">No transactions</td></tr>` : '';
+        snapshot.forEach(doc => { const tx = doc.data(); tbody.innerHTML += `<tr><td>${tx.date.toDate().toLocaleDateString()}</td><td>${tx.type}</td><td>$${tx.amount.toFixed(2)}</td><td>${tx.description}</td><td>${tx.transactionId?.substring(0,8) || ''}...</td></tr>`; });
+    }
+
+    async function handleGenerateKyc() { const code = `WMTKYC-${Date.now().toString().slice(-6)}`; await db.collection('kyc_codes').add({ code, createdAt: firebase.firestore.FieldValue.serverTimestamp(), isUsed: false }); alert(`Generated: ${code}`); loadKycCodes(); }
+    async function loadKycCodes() { const snap = await db.collection('kyc_codes').where('isUsed', '==', false).orderBy('createdAt', 'desc').get(); const tbody = document.querySelector('#kyc-codes-table tbody'); tbody.innerHTML = ''; snap.forEach(doc => { const d = doc.data(); tbody.innerHTML += `<tr><td>${d.code}</td><td>${d.createdAt.toDate().toLocaleDateString()}</td><td><button class="btn" onclick="db.collection('kyc_codes').doc('${doc.id}').delete().then(loadKycCodes)">Delete</button></td></tr>`; }); }
+    async function handleGenerateRedeem(e) { e.preventDefault(); const form = e.target; await db.collection('redeem_codes').add({ code: `WMTR-${Date.now().toString().slice(-8)}`, amount: parseFloat(form.querySelector('#redeem-amount').value), password: form.querySelector('#redeem-password').value, expiryDate: firebase.firestore.Timestamp.fromDate(new Date(form.querySelector('#redeem-expiry').value)), isUsed: false }); alert('Redeem Code Generated'); loadRedeemCodes(); form.reset(); }
+    async function loadRedeemCodes() { const snap = await db.collection('redeem_codes').orderBy('expiryDate', 'desc').get(); const tbody = document.querySelector('#redeem-codes-table tbody'); tbody.innerHTML = ''; snap.forEach(doc => { const d = doc.data(); tbody.innerHTML += `<tr><td>${d.code}</td><td>$${d.amount}</td><td>${d.password}</td><td>${d.expiryDate.toDate().toLocaleDateString()}</td><td>${d.isUsed ? 'Yes' : 'No'}</td><td><button class="btn" onclick="db.collection('redeem_codes').doc('${doc.id}').delete().then(loadRedeemCodes)">Delete</button></td></tr>`; }); }
+
+    async function loadSettings() {
+        const feesDoc = await db.collection('settings').doc('fees').get();
+        if (feesDoc.exists) {
+            const fees = feesDoc.data();
+            if(fees.user) { document.getElementById('user-send-money-fee').value = fees.user.sendMoneyFixedFee; document.getElementById('user-money-out-fee').value = (fees.user.moneyOutPercentageFee || 0) * 100; }
+            if(fees.merchant) { document.getElementById('merchant-send-money-fee').value = fees.merchant.sendMoneyFixedFee; document.getElementById('merchant-money-out-fee').value = (fees.merchant.moneyOutPercentageFee || 0) * 100; }
+        }
+        const statusDoc = await db.collection('settings').doc('status').get();
+        const status = statusDoc.exists() ? statusDoc.data() : {};
+        document.getElementById('maintenance-mode-toggle').checked = status.isMaintenanceModeEnabled === true;
+    }
+
+    async function handleSaveFees(e) {
+        e.preventDefault();
+        const data = {
+            user: { sendMoneyFixedFee: parseFloat(document.getElementById('user-send-money-fee').value) || 0, moneyOutPercentageFee: (parseFloat(document.getElementById('user-money-out-fee').value) || 0) / 100 },
+            merchant: { sendMoneyFixedFee: parseFloat(document.getElementById('merchant-send-money-fee').value) || 0, moneyOutPercentageFee: (parseFloat(document.getElementById('merchant-money-out-fee').value) || 0) / 100 }
+        };
+        await db.collection('settings').doc('fees').set(data, { merge: true });
+        alert('Fees Updated');
+    }
+
+    async function updateMaintenanceStatus(value) {
+        await db.collection('settings').doc('status').set({ isMaintenanceModeEnabled: value }, { merge: true });
+        alert(`Maintenance mode is now ${value ? 'ON' : 'OFF'}. All apps will be affected.`);
+    }
     
     </script>
 </body>
